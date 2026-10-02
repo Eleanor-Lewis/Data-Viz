@@ -1,0 +1,76 @@
+(function () {
+  // Idempotent guard. This script tag sits inside every embed div, so it
+  // will execute once per embed on the page. Only the first execution
+  // sets up the shared message listener; later executions just trigger
+  // a re-scan for any new divs.
+  if (window.__vizLoaderInitialized) {
+    window.__vizLoaderInitialized.scan();
+    return;
+  }
+
+  var EMBED_CLASS = 'my-viz-embed';
+  var processed = new WeakSet();
+
+  function createEmbed(container) {
+    if (processed.has(container)) return;
+    processed.add(container);
+
+    var src = container.getAttribute('data-src');
+    if (!src) return;
+
+    var iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.setAttribute('frameborder', '0');
+    iframe.setAttribute('scrolling', 'no');
+    iframe.setAttribute(
+      'sandbox',
+      'allow-scripts allow-same-origin allow-popups'
+    );
+    iframe.style.width = '100%';
+    iframe.style.border = 'none';
+    iframe.style.display = 'block';
+    // Sensible default before the first resize message arrives.
+    iframe.style.height = container.getAttribute('data-initial-height') || '400px';
+
+    container.appendChild(iframe);
+    container.__vizIframe = iframe;
+
+    try {
+      container.__vizOrigin = new URL(src, window.location.href).origin;
+    } catch (e) {
+      container.__vizOrigin = null;
+    }
+  }
+
+  function scan() {
+    var containers = document.querySelectorAll('.' + EMBED_CLASS);
+    for (var i = 0; i < containers.length; i++) createEmbed(containers[i]);
+  }
+
+  function onMessage(event) {
+    var data = event.data;
+    if (!data || data.type !== 'viz-embed-resize') return;
+
+    var containers = document.querySelectorAll('.' + EMBED_CLASS);
+    for (var i = 0; i < containers.length; i++) {
+      var c = containers[i];
+      // Match by iframe window reference AND origin — prevents an
+      // unrelated page from spoofing a resize message.
+      if (
+        c.__vizIframe &&
+        c.__vizIframe.contentWindow === event.source &&
+        c.__vizOrigin === event.origin
+      ) {
+        if (typeof data.height === 'number' && data.height > 0) {
+          c.__vizIframe.style.height = data.height + 'px';
+        }
+        break;
+      }
+    }
+  }
+
+  window.addEventListener('message', onMessage);
+  window.__vizLoaderInitialized = { scan: scan };
+
+  scan();
+})();

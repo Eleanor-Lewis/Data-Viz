@@ -1,0 +1,25 @@
+(function () {
+  if (window.parent === window) return; // not embedded in an iframe, skip
+
+  function postHeight() {
+    var height = document.documentElement.scrollHeight;
+    // '*' targetOrigin because the child doesn't know in advance which
+    // domain will embed it. The loader.js on the parent side checks
+    // the message origin against the iframe's own src origin, so the
+    // security check happens on the receiving end instead.
+    window.parent.postMessage({ type: 'viz-embed-resize', height: height }, '*');
+  }
+
+  postHeight();
+  window.addEventListener('load', postHeight);
+  // Re-measure shortly after load in case charts/fonts/images finish
+  // rendering asynchronously after first paint.
+  setTimeout(postHeight, 500);
+
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(postHeight);
+    ro.observe(document.documentElement);
+  } else {
+    window.addEventListener('resize', postHeight);
+  }
+})();
