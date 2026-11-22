@@ -134,6 +134,8 @@ svg text{font-family:var(--sans)}
 .legend .ttl{font-weight:600;width:100%}
 .legend .k{display:inline-flex;align-items:center;gap:.35rem}
 .legend .k i{display:inline-block;width:12px;height:12px}
+.legend .end{font-weight:600;color:var(--mute);white-space:nowrap}
+.legend .sub{width:100%;color:var(--mute);margin-top:-.15rem}
 .panel{font-family:var(--sans);font-size:.86rem;line-height:1.45}
 .panel label{display:block;font-weight:600;font-size:.78rem;margin-bottom:.35rem}
 .search{display:flex;gap:.4rem}
@@ -150,6 +152,7 @@ svg text{font-family:var(--sans)}
 .detail .where{color:var(--mute);font-size:.78rem;margin-bottom:.8rem}
 .pctline{display:flex;align-items:baseline;gap:.5rem;margin:.2rem 0 .5rem}
 .pctline .big{font-family:var(--serif);font-size:2.4rem;line-height:1;font-weight:500}
+.pctends{display:flex;justify-content:space-between;font-family:var(--sans);font-size:.7rem;color:var(--mute);margin:-.75rem 0 1rem}
 .pctbar{position:relative;height:10px;background:linear-gradient(90deg,#d6d1cb 0 75%,#e8a08a 75% 90%,#d9654f 90% 95%,#bb3328 95% 99%,#520a0e 99%);margin:.2rem 0 1rem}
 .pctbar i{position:absolute;top:-4px;width:2px;height:18px;background:var(--ink)}
 .facts{display:grid;grid-template-columns:auto 1fr;gap:.3rem .8rem;margin:0}
@@ -306,8 +309,8 @@ svg text{font-family:var(--sans)}
     <div class="kicker">Every lot in the city</div>
     <h2 id="lk-title">Which lots look like the ones that came down?</h2>
     <p>Each of the <span class="num">804,166</span> lots with a building in the five boroughs is scored by how closely it resembles lots demolished in the past. Unused floor area carries the most weight; age, size, use, borough, landmark status and recent rezonings adjust it.</p>
-    <p>The score uses the limits in force before City of Yes, the version that could be tested. A version trained on demolitions from 2008 to 2020 put <b>60 percent</b> of the 2020–23 demolitions, which it had never seen, in the riskiest tenth of lots. Since January 2024, demolition has been filed for <span class="num">2,555</span> scored lots; 47 percent were in that tenth.</p>
-    <p class="note sans" style="font-size:.8rem;color:var(--mute)">A high score means a lot shares traits with past demolitions. It is not a forecast for any one building.</p>
+    <p>The score uses the limits in force before City of Yes, the version that could be tested. A version trained on demolitions from 2008 to 2020 put <b>60 percent</b> of the 2020–23 demolitions, which it had never seen, in the riskiest tenth of lots (a risk rank of 90 or higher). Since January 2024, demolition has been filed for <span class="num">2,555</span> scored lots; 47 percent were in that tenth.</p>
+    <p class="note sans" style="font-size:.8rem;color:var(--mute)">Each lot gets a risk rank from 0 to 99: 99 means it looks most like the lots that were demolished, 0 the least. The score is built only from the city's lot and zoning records. It has no information about who owns a lot, whether it has been sold or how the building is holding up, so it is not a forecast for any one building.</p>
   </div>
   <div class="lk-grid">
     <div>
@@ -348,7 +351,7 @@ svg text{font-family:var(--sans)}
     <h3>The model</h3>
     <p>A weighted case-control logistic regression: all demolished lots and a 2 percent sample of the rest, weighted back to the full count. The rezoning test is a difference-in-differences: for lots with no zoning change in the previous round, it compares the change in demolition rates on rezoned lots with the change on lots left alone.</p>
     <h3>The scores</h3>
-    <p>Each lot's score comes from the same model refit on demolitions filed from August 2011 to July 2023 and applied to the 2026 lot file, with the allowance as recorded in 2024. Tested out of time (trained on 2008–2020, tested on August 2020 to July 2023), it scored an AUC of 0.851, and its predictions ran about 20 percent high. The City of Yes figure applies the same model to the 2026 limits, which it was never trained on.</p>
+    <p>The score uses only the city's lot, zoning and demolition records; it has no information about owners, sales or building condition. The risk rank is the lot's percentile among all scored lots, from 0 to 99. Each lot's score comes from the same model refit on demolitions filed from August 2011 to July 2023 and applied to the 2026 lot file, with the allowance as recorded in 2024. Tested out of time (trained on 2008–2020, tested on August 2020 to July 2023), it scored an AUC of 0.851, and its predictions ran about 20 percent high. The City of Yes figure applies the same model to the 2026 limits, which it was never trained on.</p>
     <h3>Sources</h3>
     <ul>
       <li>NYC Open Data: <a href="https://data.cityofnewyork.us/d/5zhs-2jue">Building Footprints</a>, <a href="https://data.cityofnewyork.us/d/ic3t-wcy2">DOB Job Application Filings</a>, <a href="https://data.cityofnewyork.us/d/w9ak-ipjd">DOB NOW: Build Job Application Filings</a>, <a href="https://data.cityofnewyork.us/d/3h2n-5cm9">DOB Violations</a>, <a href="https://data.cityofnewyork.us/d/tb8q-a3ar">HPD Order to Repair/Vacate Orders</a>, <a href="https://data.cityofnewyork.us/d/gthc-hcne">Borough Boundaries</a></li>
@@ -487,12 +490,8 @@ const OPEN = (() => {
       const a = mg.getImageData(0, 0, cols, rows).data; inside = new Uint8Array(cols * rows);
       const touch = new Uint8Array(cols * rows);
       for (let i = 0; i < touch.length; i++) touch[i] = a[i * 4 + 3] > 0 ? 1 : 0;
-      inside = new Uint8Array(cols * rows);
-      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
-        let v = 0;
-        for (let dy = -1; dy <= 1 && !v; dy++) for (let dx = -1; dx <= 1 && !v; dx++) { const xx = x + dx, yy = y + dy; if (xx >= 0 && yy >= 0 && xx < cols && yy < rows && touch[yy * cols + xx]) v = 1; }
-        inside[y * cols + x] = v;
-      }
+      // only cells the island actually touches are kept free, so the red margin is less than one cell wide
+      inside = touch;
       outside = 0; for (const v of inside) if (!v) outside++;
       L = { gx0, gy0 };
       if (outside >= nd && cols * rows >= ns + nd) break;
@@ -1244,10 +1243,13 @@ const MAP = (() => {
   }
   function legend() {
     const el = $('#legend');
-    if (DOTS()) el.innerHTML = `<span class="ttl">Each square is a lot, shaded by how its score ranks among all scored lots</span>` +
-      [['Below 75th percentile', 0], ['75th–90th', 1], ['90th–95th', 2], ['95th–99th', 3], ['Top 1%', 4]].map(([l, b]) => `<span class="k"><i style="background:${RAMP[b]}"></i>${l}</span>`).join('');
-    else el.innerHTML = `<span class="ttl">Share of lots in each hexagon that rank in the riskiest tenth citywide (hexagons with fewer than 15 lots left blank)</span>` +
-      [['Under 5%', 0], ['5–10%', 1], ['10–20%', 2], ['20–30%', 3], ['30–45%', 4], ['45% or more', 5]].map(([l, b]) => `<span class="k"><i style="background:${HEXR[b]}"></i>${l}</span>`).join('');
+    const keys = (items, cols) => `<span class="end">Lower risk</span>` + items.map(([l, b]) => `<span class="k"><i style="background:${cols[b]}"></i>${l}</span>`).join('') + `<span class="end">Higher risk</span>`;
+    if (DOTS()) el.innerHTML = `<span class="ttl">Zoomed in: each square is one lot, shaded by its risk rank</span>` +
+      keys([['Rank 0–74', 0], ['75–89', 1], ['90–94', 2], ['95–98', 3], ['99', 4]], RAMP) +
+      `<span class="sub">Rank 99 = most like past demolitions; rank 0 = least. Darker red is always higher risk.</span>`;
+    else el.innerHTML = `<span class="ttl">Zoomed out: share of each hexagon's lots with a risk rank of 90 or higher</span>` +
+      keys([['Under 5%', 0], ['5–10%', 1], ['10–20%', 2], ['20–30%', 3], ['30–45%', 4], ['45% or more', 5]], HEXR) +
+      `<span class="sub">Darker red is always higher risk. Hexagons with fewer than 15 lots are left blank. Zoom in to see single lots.</span>`;
   }
   function zoomAt(f, X = W / 2, Y = H / 2) { const wx = WX(X), wy = WY(Y); view.s = clamp(view.s * f, .008, 2.5); view.cx = wx - (X - W / 2) / view.s; view.cy = wy + (Y - H / 2) / view.s; render(); }
   $('#zin').onclick = () => zoomAt(2); $('#zout').onclick = () => zoomAt(.5); $('#zall').onclick = () => { fitAll(); render(); };
@@ -1281,11 +1283,11 @@ const MAP = (() => {
     return best;
   }
   function hover(X, Y) {
-    if (DOTS()) { const i = nearest(X, Y, 6); if (i < 0) { tip.style.display = 'none'; return; } tip.innerHTML = `Ranks above <b>${L.pct[i]}%</b> of lots<br><span style="color:${MUTE}">Click for details</span>`; }
+    if (DOTS()) { const i = nearest(X, Y, 6); if (i < 0) { tip.style.display = 'none'; return; } tip.innerHTML = `Risk rank <b>${L.pct[i]}</b> <span style="color:${MUTE}">(0 lowest, 99 highest)</span><br><span style="color:${MUTE}">Click for details</span>`; }
     else {
       const { R, map } = hexes(); const [rx, rz] = hexKey(WX(X), WY(Y), R);
       const e = map.get(rx * 100000 + rz); if (!e || e[2] < 15) { tip.style.display = 'none'; return; }
-      tip.innerHTML = `<b>${fmt(e[2])}</b> lots<br><b>${Math.round(100 * e[3] / e[2])}%</b> in the riskiest tenth<br><span style="color:${MUTE}">Zoom in to see single lots</span>`;
+      tip.innerHTML = `<b>${fmt(e[2])}</b> lots<br><b>${Math.round(100 * e[3] / e[2])}%</b> with a risk rank of 90 or higher<br><span style="color:${MUTE}">Zoom in to see single lots</span>`;
     }
     tip.style.display = 'block'; tip.style.left = Math.min(W - 180, X + 14) + 'px'; tip.style.top = Math.min(H - 70, Y + 14) + 'px';
   }
@@ -1323,8 +1325,8 @@ const MAP = (() => {
     const band = pctBand(pct); const bandTxt = ['below the riskiest quarter', 'in the riskiest quarter', 'in the riskiest tenth', 'in the riskiest 5 percent', 'in the riskiest 1 percent'][band];
     el.innerHTML = `<h3>${esc(head)}</h3><div class="where">${esc(where)}</div>` +
       (filed ? `<span class="flag">Demolition filed since Jan. 2024</span>` : '') +
-      `<div class="pctline"><span class="big num">${pct}</span><span>Ranks above ${pct} percent of the city's scored lots, ${bandTxt}.</span></div>` +
-      `<div class="pctbar" aria-hidden="true"><i style="left:calc(${pct}% - 1px)"></i></div>` +
+      `<div class="pctline"><span class="big num">${pct}</span><span>Risk rank, out of 99. This lot scores higher than ${pct} percent of the city's scored lots, ${bandTxt}.</span></div>` +
+      `<div class="pctbar" aria-hidden="true"><i style="left:calc(${pct}% - 1px)"></i></div><div class="pctends" aria-hidden="true"><span>0 · lower risk</span><span>99 · higher risk</span></div>` +
       (use !== null ? farBlock(bf, mf, mfc, use) : `<div>Floor area use: ${UBAND[ub]} of its allowance</div>`) +
       `<dl class="facts" style="margin-top:.8rem">` +
       (bf !== null ? `<dt>Built FAR</dt><dd class="num">${bf.toFixed(2)}</dd>` : '') +
@@ -1332,7 +1334,7 @@ const MAP = (() => {
       (mfc > 0 ? `<dt>Limit, 2026</dt><dd class="num">${mfc.toFixed(2)}${mfc > mf * 1.0001 ? ' <span style="color:var(--red)">raised</span>' : mfc < mf * .9999 ? ' lowered' : ''}</dd>` : '') +
       `<dt>Landmark or historic district</dt><dd>${prot ? 'Yes' : 'No'}</dd>` +
       (yb ? `<dt>Year built on record</dt><dd class="num">${yb}</dd>` : '') + (nf ? `<dt>Floors</dt><dd class="num">${nf}</dd>` : '') + (lu ? `<dt>Use</dt><dd>${LU[lu] || ''}</dd>` : '') +
-      `</dl><p class="caveat">The score measures how much this lot resembles lots demolished in the past, mostly through unused floor area. It is not a forecast for this building. Data: PLUTO 26v3 and 24v1; DOB filings.</p>`;
+      `</dl><p class="caveat">The score measures how much this lot resembles lots demolished in the past, mostly through unused floor area. It knows nothing about the lot's owner, any sale or the building's condition, so it is not a forecast for this building. Data: PLUTO 26v3 and 24v1; DOB filings.</p>`;
   }
   function farBlock(bf, mf, mfc, use) {
     const top = Math.max(bf, mf, mfc || 0) * 1.04; const P = v => (100 * v / top).toFixed(1) + '%';
@@ -1382,7 +1384,7 @@ const MAP = (() => {
     }
     res.sort((a, b) => a[0] - b[0] || a[1] - b[1] || (parseInt(a[2][0]) || 0) - (parseInt(b[2][0]) || 0));
     const top = res.slice(0, 12);
-    list.innerHTML = top.map((x, k) => { const r = x[2]; const scored = r[3] >= 0; return `<li><button type="button" data-k="${k}">${esc(title(`${r[0]} ${x[3]}`))}<br><span class="sub">${BORO[b]}${r[2] ? ' ' + r[2] : ''}${scored ? ` · ranks above ${r[4]}%` : ' · not scored'}</span></button></li>`; }).join('');
+    list.innerHTML = top.map((x, k) => { const r = x[2]; const scored = r[3] >= 0; return `<li><button type="button" data-k="${k}">${esc(title(`${r[0]} ${x[3]}`))}<br><span class="sub">${BORO[b]}${r[2] ? ' ' + r[2] : ''}${scored ? ` · risk rank ${r[4]} of 99` : ' · not scored'}</span></button></li>`; }).join('');
     list.style.display = top.length ? 'block' : 'none';
     status.textContent = top.length ? `${res.length > 12 ? 'Showing 12 of ' + fmt(res.length) : fmt(res.length)} match${res.length === 1 ? '' : 'es'}.` : 'No matching address in this borough. Try the street name alone, or check the borough.';
     list.querySelectorAll('button').forEach(btn => btn.onclick = () => { const x = top[+btn.dataset.k]; pick(x[2], x[3]); });
