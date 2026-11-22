@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why New York Tears Down Its Buildings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* one visual world: newsprint white, ink black, demolition red. Pinned full-height stages; text cards scroll over them. */
+  --paper:#ffffff;
+  --ink:#141414;
+  --red:#b0121b;
+  --red-deep:#6e0b10;
+  --mute:#6c6662;
+  --rule:#e3dfdb;
+  --land:#f1efec;
+  --serif:"Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --sans:"Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font-family:var(--serif);font-size:20px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;font-weight:500;margin:0}
+.sans{font-family:var(--sans)}
+
+/* ---------- scenes ---------- */
+.scene{position:relative}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--paper)}
+.stage canvas,.stage svg.full{position:absolute;inset:0;width:100%;height:100%;display:block}
+.steps{position:relative;z-index:3;margin-top:-100vh;margin-top:-100svh;pointer-events:none}
+.step{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:0 max(16px,4.5vw)}
+.step.short{min-height:70vh}
+.step.tail{min-height:60vh}
+.card{pointer-events:auto;max-width:25rem;background:var(--paper);padding:1rem 1.25rem 1.1rem;border:1px solid var(--rule);box-shadow:0 2px 14px rgba(20,20,20,.07);font-size:1.02rem;line-height:1.5}
+.card p{margin:0 0 .6em}
+.card p:last-child{margin-bottom:0}
+.card .note{font-family:var(--sans);font-size:.74rem;line-height:1.45;color:var(--mute);margin-top:.7em}
+.card .label{display:block;font-family:var(--sans);font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--red);margin-bottom:.35em}
+.marker{height:2px}
+.spacer{height:88vh;height:88svh}
+.mute{color:var(--mute)}
+b,strong{font-weight:600}
+.num{font-variant-numeric:tabular-nums lining-nums}
+.sq{display:inline-block;width:.62em;height:.62em;vertical-align:.02em;margin-right:.15em}
+
+/* ---------- opening ---------- */
+#open .stage{background:#fff}
+.hero{position:absolute;z-index:2;left:max(16px,4.5vw);top:max(16px,6vh);max-width:31rem;transition:none}
+.kicker{font-family:var(--sans);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.8rem}
+.hero h1{font-size:clamp(2.2rem,4.6vw,3.6rem);line-height:1.02;letter-spacing:-.018em;font-weight:500}
+.dek{font-size:clamp(1.05rem,1.5vw,1.22rem);line-height:1.42;margin:1rem 0 1rem;max-width:27rem}
+.byline{font-family:var(--sans);font-size:.78rem;color:var(--mute)}
+.byline b{color:var(--ink);font-weight:600}
+.scrollcue{font-family:var(--sans);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-top:1.4rem;display:flex;gap:.5rem;align-items:center}
+.scrollcue::after{content:"";width:1px;height:28px;background:var(--mute)}
+.ov{position:absolute;z-index:2;pointer-events:none;font-family:var(--sans);opacity:0}
+.ov-legend{right:max(16px,3vw);bottom:max(16px,4vh);color:#fff;font-size:.78rem;line-height:1.4;text-align:right;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.ov-legend .sq{background:#141414;outline:1px solid rgba(255,255,255,.55)}
+.ov-share{font-size:.8rem;font-weight:600;letter-spacing:.02em;padding:.25rem .5rem}
+.ov-share .big{display:block;font-family:var(--serif);font-weight:500;font-size:clamp(2rem,4vw,3rem);line-height:1;letter-spacing:-.02em}
+#ov-stand{color:var(--red);background:#fff;padding:.45rem .7rem}
+#ov-gone{color:#fff;background:#141414;padding:.45rem .7rem}
+.question{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 6vw;text-align:center;z-index:2;opacity:0;pointer-events:none}
+.question h2{color:#fff;font-size:clamp(2.4rem,6.4vw,5.4rem);line-height:1.02;letter-spacing:-.025em;font-weight:500;max-width:14ch}
+
+/* ---------- charts ---------- */
+.chartwrap{position:absolute;inset:0}
+svg text{font-family:var(--sans)}
+.reveal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 7vw;opacity:0;pointer-events:none;z-index:2}
+.reveal h2{font-size:clamp(2.1rem,5.2vw,4.4rem);line-height:1.06;letter-spacing:-.022em;max-width:16ch;text-align:center}
+.reveal h2 em{font-style:italic;color:var(--red)}
+
+/* ---------- suspect title beats ---------- */
+.sbeat{position:absolute;inset:0;z-index:2;pointer-events:none;display:grid;grid-template-columns:23vw minmax(0,1fr);align-items:center;gap:3.5vw;padding:0 4.5vw;visibility:hidden}
+.sbeat .bk,.sbeat .bt,.sbeat figure{opacity:0;will-change:opacity,transform}
+.sbeat .bk{font-family:var(--sans);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:.9rem}
+.sbeat .bt{font-family:var(--serif);font-size:clamp(3.2rem,6.4vw,6.6rem);line-height:.9;letter-spacing:-.035em;font-weight:500}
+.sbeat .ph{display:grid;grid-template-columns:1fr 1fr;gap:1.8vw;align-items:start}
+.sbeat figure{margin:0;width:min(100%,calc((100svh - 15rem) * 1.3333))}
+.sbeat figure.f2{margin-top:9vh}
+.sbeat img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#ececec;outline:1px solid rgba(0,0,0,.12);outline-offset:-1px}
+.sbeat figcaption{font-family:var(--sans);font-size:.7rem;line-height:1.38;color:var(--mute);margin-top:.5rem;max-width:30rem}
+.sbeat figcaption .cr{display:block;color:#9a9a9a;margin-top:.15rem}
+@media (max-width:760px){
+  .step.short{min-height:120vh;min-height:120svh}
+  .sbeat{grid-template-columns:1fr;align-content:center;gap:1.1rem;padding:0 16px}
+  .sbeat .bt{font-size:clamp(3rem,15vw,4.4rem)}
+  .sbeat .bk{margin-bottom:.5rem}
+  .sbeat .ph{grid-template-columns:1fr;gap:.9rem}
+  .sbeat figure{width:min(80%,calc((100svh - 17rem) * .6667))}
+  .sbeat figure.f2{margin-top:0;justify-self:end}
+}
+
+/* ---------- brownstone ---------- */
+#far .stage{background:#fff}
+.far-letters{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:clamp(.6rem,3vw,3rem);pointer-events:none;z-index:2}
+.far-letters .w{display:flex;flex-direction:column;align-items:center}
+.far-letters .L{font-size:clamp(5rem,16vw,13rem);line-height:.9;font-weight:500;letter-spacing:-.03em}
+.far-letters .rest{font-family:var(--serif);font-size:clamp(1.2rem,2.6vw,2.3rem);color:var(--red);font-style:italic;white-space:nowrap}
+.hl{position:absolute;z-index:2;font-family:var(--sans);font-size:.78rem;line-height:1.25;color:var(--ink);white-space:nowrap;pointer-events:none;opacity:0;transform:translate(-50%,-50%)}
+.hl.red{color:var(--red);font-weight:600}
+.hl.left{transform:translate(0,-50%)}
+.hl.red.left{font-size:.82rem}
+.hl.tag{background:#fff;padding:.1rem .3rem;border:1px solid var(--rule)}
+.equation{position:absolute;z-index:2;font-family:var(--serif);opacity:0;pointer-events:none;text-align:left}
+.equation .eq{font-size:clamp(1.6rem,3.2vw,2.6rem);line-height:1.1;letter-spacing:-.01em}
+.equation .eq .r{color:var(--red)}
+.equation .cap{font-family:var(--sans);font-size:.74rem;color:var(--mute);margin-top:.3rem}
+.illus{position:absolute;z-index:2;right:max(16px,3vw);bottom:max(12px,2.5vh);font-family:var(--sans);font-size:.7rem;color:var(--mute);max-width:21rem;text-align:right;opacity:0;pointer-events:none}
+
+/* ---------- map ---------- */
+#lookup{padding:12vh max(16px,4.5vw) 3rem;border-top:1px solid var(--rule)}
+.lk-head{max-width:44rem}
+.lk-head h2{font-size:clamp(1.9rem,3.8vw,3rem);line-height:1.05;letter-spacing:-.02em;margin-bottom:1rem}
+.lk-head p{margin:0 0 .8em;max-width:40rem}
+.lk-grid{display:grid;grid-template-columns:minmax(0,1fr) 22rem;gap:1.5rem;margin-top:1.8rem;align-items:start}
+@media (max-width:980px){.lk-grid{grid-template-columns:1fr}}
+.mapbox{position:relative;height:min(78vh,760px);min-height:420px;background:#fff;border:1px solid var(--rule);overflow:hidden;touch-action:pan-y}
+.mapbox canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+.mapbox canvas.drag{cursor:grabbing}
+.mapctl{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.mapctl button{width:34px;height:34px;border:1px solid var(--rule);background:#fff;font:600 18px/1 var(--sans);color:var(--ink);cursor:pointer}
+.mapctl button:hover{border-color:var(--ink)}
+.maphint{position:absolute;left:10px;bottom:10px;z-index:2;font-family:var(--sans);font-size:.72rem;color:var(--mute);background:rgba(255,255,255,.9);padding:.25rem .45rem}
+.mapload{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:.85rem;color:var(--mute);z-index:1}
+.maptip{position:absolute;z-index:3;pointer-events:none;background:#fff;border:1px solid var(--ink);padding:.35rem .5rem;font-family:var(--sans);font-size:.75rem;line-height:1.35;display:none;max-width:15rem}
+.legend{font-family:var(--sans);font-size:.75rem;color:var(--ink);display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center;margin:.7rem 0 0}
+.legend .ttl{font-weight:600;width:100%}
+.legend .k{display:inline-flex;align-items:center;gap:.35rem}
+.legend .k i{display:inline-block;width:12px;height:12px}
+.panel{font-family:var(--sans);font-size:.86rem;line-height:1.45}
+.panel label{display:block;font-weight:600;font-size:.78rem;margin-bottom:.35rem}
+.search{display:flex;gap:.4rem}
+.search select,.search input{font:inherit;font-size:.9rem;padding:.55rem .6rem;border:1px solid #bdb7b2;background:#fff;color:var(--ink);border-radius:0;min-width:0}
+.search input{flex:1}
+.search select{flex:0 0 auto}
+.results{list-style:none;margin:.3rem 0 0;padding:0;border:1px solid var(--rule);max-height:15rem;overflow:auto;display:none}
+.results li button{all:unset;display:block;width:100%;box-sizing:border-box;padding:.45rem .6rem;cursor:pointer;border-bottom:1px solid var(--rule)}
+.results li button:hover,.results li button:focus-visible{background:#f6f3f1}
+.results .sub{color:var(--mute);font-size:.76rem}
+.status{font-size:.78rem;color:var(--mute);min-height:1.2em;margin-top:.35rem}
+.detail{margin-top:1.1rem;border-top:3px solid var(--ink);padding-top:.8rem;display:none}
+.detail h3{font-family:var(--serif);font-size:1.35rem;line-height:1.15;margin-bottom:.2rem}
+.detail .where{color:var(--mute);font-size:.78rem;margin-bottom:.8rem}
+.pctline{display:flex;align-items:baseline;gap:.5rem;margin:.2rem 0 .5rem}
+.pctline .big{font-family:var(--serif);font-size:2.4rem;line-height:1;font-weight:500}
+.pctbar{position:relative;height:10px;background:linear-gradient(90deg,#d6d1cb 0 75%,#e8a08a 75% 90%,#d9654f 90% 95%,#bb3328 95% 99%,#520a0e 99%);margin:.2rem 0 1rem}
+.pctbar i{position:absolute;top:-4px;width:2px;height:18px;background:var(--ink)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:.3rem .8rem;margin:0}
+.facts dt{color:var(--mute)}
+.facts dd{margin:0}
+.farbar{position:relative;height:14px;background:#fff;border:1px solid var(--ink);margin:.35rem 0 .2rem}
+.farbar .used{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
+.farbar .coy{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--red)}
+.caveat{font-size:.76rem;color:var(--mute);margin-top:.9rem}
+.flag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:.15rem .4rem;background:var(--red);color:#fff;margin:.1rem 0 .4rem}
+
+/* ---------- methods ---------- */
+#methods{padding:5rem max(16px,4.5vw) 6rem;border-top:1px solid var(--rule);background:#faf9f7}
+#methods .inner{max-width:42rem}
+#methods h2{font-size:1.6rem;margin-bottom:1rem}
+#methods h3{font-family:var(--sans);font-size:.78rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;margin:1.8rem 0 .5rem;color:var(--red)}
+#methods p,#methods li{font-size:.95rem;line-height:1.55}
+#methods ul{padding-left:1.1rem;margin:.4rem 0}
+#methods li{margin-bottom:.35rem}
+.foot{font-family:var(--sans);font-size:.75rem;color:var(--mute);margin-top:2.5rem}
+
+@media (max-width:760px){
+  body{font-size:18px}
+  .step{align-items:flex-end;padding-bottom:9vh}
+  .card{max-width:none;width:100%;font-size:.98rem}
+  .hero{right:16px}
+  .ov-legend{bottom:auto;top:12px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- =========================================================== 1. OPENING: MANHATTAN -->
+<section class="scene" id="open" aria-label="How many of Manhattan's buildings are gone">
+  <div class="stage">
+    <canvas id="c-open" aria-hidden="true"></canvas>
+    <header class="hero" id="hero">
+      <div class="kicker">Demolition in New York</div>
+      <h1>Why New York Tears Down Its Buildings</h1>
+      <p class="dek">About 72 percent of the buildings that have stood in Manhattan since 1889 are gone. We tested the usual explanations against the city's own records.</p>
+      <div class="byline">By <b>Eleanor Lewis</b> · November 2026</div>
+      <div class="scrollcue">Scroll</div>
+    </header>
+    <div class="ov ov-legend" id="ov-legend"><span class="sq"></span> = <span class="unitn">5</span> buildings<br>Squares show counts, not locations</div>
+    <div class="ov ov-share" id="ov-stand"><span class="big">28%</span>still standing</div>
+    <div class="ov ov-share" id="ov-gone"><span class="big">72%</span>torn down</div>
+    <div class="question" id="question"><h2>Why were they torn down?</h2></div>
+  </div>
+  <div class="steps">
+    <div class="spacer" aria-hidden="true"></div>
+    <div class="step"><div class="card"><p>This is Manhattan today. Each white speck is one of its <b class="num">44,603</b> standing buildings.</p></div></div>
+    <div class="step"><div class="card"><p>Since 1889, about <b class="num">116,000</b> other buildings on the island have been torn down.</p><p class="note">Each black square stands for <span class="unitn">5</span> buildings. Most demolished buildings were never mapped, so the squares show how many, not where.</p></div></div>
+    <div class="step"><div class="card"><p>Of the roughly <b class="num">161,000</b> buildings that have stood on the island since 1889, about <b>28 percent</b> remain.</p><p class="note">Estimates range from 26 to 29 percent, depending on how buildings from the 1890s are counted. Here the standing buildings are redrawn at the same <span class="unitn">5</span> buildings per square.</p></div></div>
+    <div class="step"><div class="marker"></div></div>
+    <div class="step tail"><div class="marker"></div></div>
+  </div>
+</section>
+
+<!-- =========================================================== 2. SUSPECTS: AGE AND DAMAGE -->
+<section class="scene" id="suspects" aria-label="Testing age and damage">
+  <div class="stage">
+    <svg class="full" id="svg-sus" aria-hidden="true"></svg>
+    <div class="sbeat" id="sus-age">
+      <div class="tt"><div class="bk">Suspect one</div><h2 class="bt">Age</h2></div>
+      <div class="ph">
+        <figure class="f1"><img src="img/age-1.jpg" width="1000" height="750" loading="lazy" decoding="async" alt="Brick row buildings with fire escapes and bracketed cornices."></figure>
+        <figure class="f2"><img src="img/age-2.jpg" width="1400" height="1167" style="aspect-ratio:6/5" loading="lazy" decoding="async" alt="Three five-story tenements with fire escapes above a delicatessen, a florist and a candy store, with cars parked at the curb."><figcaption>Tenements at 808–810 Second Avenue, Manhattan, photographed for the Historic American Buildings Survey. The buildings have since been torn down.<span class="cr">Historic American Buildings Survey / Library of Congress</span></figcaption></figure>
+      </div>
+    </div>
+    <div class="sbeat" id="sus-dmg">
+      <div class="tt"><div class="bk">Suspect two</div><h2 class="bt">Damage</h2></div>
+      <div class="ph">
+        <figure class="f1"><img src="img/damage-1.jpg" width="1365" height="1024" loading="lazy" decoding="async" alt="Close view of a stone facade with peeling paint and dark water stains below a window."></figure>
+        <figure class="f2"><img src="img/damage-2.jpg" width="1400" height="1050" loading="lazy" decoding="async" alt="An empty wooden house with weathered clapboard and a sagging porch roof."><figcaption>An empty house at 1045 East 15th Street, Brooklyn, 2012. It was demolished the next year.<span class="cr">Jim Henderson / Wikimedia Commons</span></figcaption></figure>
+      </div>
+    </div>
+    <div class="reveal" id="reveal"><h2>The main reason has less to do with the building than with <em>the lot under it.</em></h2></div>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="card"><p>To find out, we followed every full demolition the city permitted from August 2002 to January 2026 in all five boroughs: <b class="num">30,424</b> lots.</p><p class="note">From here on, the numbers are citywide.</p></div></div>
+    <div class="step short"><div class="marker"></div></div>
+    <div class="step"><div class="card"><p>Old buildings wear out. If age drove demolition, the oldest buildings would come down fastest.</p></div></div>
+    <div class="step"><div class="card"><p>They don't. Buildings from before 1900 were torn down less often than buildings from 1900 to 1929.</p><p>The median demolished building was 85 years old. The median age of all the city's buildings over those years was 80.</p></div></div>
+    <div class="step"><div class="card"><p>Age isn't innocent. Buildings from 1960 on came down at less than half the rate of older ones.</p><p>But most of the city's buildings are old, and most old buildings stay up. Age doesn't explain most demolitions.</p></div></div>
+    <div class="step short"><div class="marker"></div></div>
+    <div class="step"><div class="card"><p>Fires, collapses and neglect bring buildings down too. We checked each full demolition filed from 2015 to 2025 against the city's records of damage and danger.</p></div></div>
+    <div class="step"><div class="card"><p>Only <b>7.8 percent</b> of <span class="num">16,108</b> demolitions had one: an unsafe-building or emergency violation in the three years before the filing, a city vacate order for fire damage or unlivable conditions, or a filing that describes fire, collapse, storm damage or an emergency.</p><p class="note">Records miss some damage, so 7.8 percent is a floor. Each square is 1 percent of the demolitions.</p></div></div>
+    <div class="step"><div class="marker"></div></div>
+    <div class="step tail"><div class="marker"></div></div>
+  </div>
+</section>
+
+<!-- =========================================================== 3. FAR AND THE BROWNSTONE -->
+<section class="scene" id="far" aria-label="Floor area ratio, explained with a brownstone">
+  <div class="stage">
+    <canvas id="c-house" aria-hidden="true"></canvas>
+    <div class="far-letters" id="far-letters" aria-hidden="true">
+      <div class="w"><span class="L">F</span><span class="rest">Floor</span></div>
+      <div class="w"><span class="L">A</span><span class="rest">Area</span></div>
+      <div class="w"><span class="L">R</span><span class="rest">Ratio</span></div>
+    </div>
+    <div id="house-ov"></div>
+    <div class="equation" id="equation"><div class="eq"><span class="num">4,000</span> sq ft <span class="mute">÷</span> <span class="num">2,000</span> sq ft = <span class="r">FAR 2.0</span></div><div class="cap">floor area ÷ lot area</div></div>
+    <div class="illus" id="illus">Illustration of a typical lot. The extra floors show the amount of space allowed; real zoning also limits height, depth and yards.</div>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="card"><p>Every lot in New York comes with a limit on how much floor space can be built on it. Planners write the limit as a <b>floor area ratio</b>, or FAR.</p></div></div>
+    <div class="step"><div class="card"><p>Take a brownstone of the kind found on thousands of Brooklyn and Manhattan blocks: four stories, built around 1900.</p></div></div>
+    <div class="step"><div class="card"><p>Its lot is 20 feet wide and 100 feet deep. That makes <b>2,000 square feet</b> of land.</p></div></div>
+    <div class="step"><div class="card"><p>Each of its four floors is 20 by 50 feet, or 1,000 square feet. Together they hold <b>4,000 square feet</b>.</p></div></div>
+    <div class="step"><div class="card"><p>Divide the floor area by the lot area and you have the FAR: 4,000 ÷ 2,000 = <b>2.0</b>.</p></div></div>
+    <div class="step"><div class="card"><p>Now suppose the zoning here allows a FAR of 4.0. The lot could hold <b>8,000 square feet</b>, the equivalent of four more floors. The house uses half of its allowance.</p></div></div>
+    <div class="step"><div class="card"><p>To a buyer who wants to build, those 4,000 unbuilt square feet can be worth more than the house. Getting at them usually means tearing the house down.</p></div></div>
+    <div class="step"><div class="card"><p>On a block where the limit is 2.0, the same house already uses everything it is allowed. There is nothing more to build, and far less reason to knock it down.</p></div></div>
+    <div class="step tail"><div class="marker"></div></div>
+  </div>
+</section>
+
+<!-- =========================================================== 4. THE EVIDENCE ON FAR -->
+<section class="scene" id="evidence" aria-label="Demolition rates by unused floor area">
+  <div class="stage">
+    <canvas id="c-ev" aria-hidden="true"></canvas>
+    <svg class="full" id="svg-ev" aria-hidden="true"></svg>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="card"><p>Back to the evidence. Here are the demolition rates by building age again.</p></div></div>
+    <div class="step"><div class="card"><p>Now the same rate, grouped by how much of its allowed floor area each lot was using, on the same scale.</p></div></div>
+    <div class="step"><div class="card"><p>Lots using less than a quarter of their allowance came down <b>41 times</b> as often as lots at or past their limit.</p><p>Compared with lots of similar age, size, use, borough and landmark status, the odds were still about <b>18 times</b> higher.</p></div></div>
+    <div class="step"><div class="card"><p>The new buildings constructed after a demolition fit the pattern. Whether a demolished lot had been using a fifth of its allowance or three-quarters of it, the median building that replaced it used <b>all of it</b>.</p><p class="note">Among demolished lots with a new building on record a few years later (63 percent). About 20 percent had been merged into larger lots, and 17 percent were still empty.</p></div></div>
+    <div class="step tail"><div class="marker"></div></div>
+  </div>
+</section>
+
+<!-- =========================================================== 5. THE POLICY LINK -->
+<section class="scene" id="policy" aria-label="What happens when the city rezones">
+  <div class="stage">
+    <svg class="full" id="svg-pol" aria-hidden="true"></svg>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="card"><p>The limits are set by the city, and the city changes them. Rezonings adopted from 2003 to 2007 alone covered about <b>188,000 lots</b>: 14 percent got a higher limit and 23 percent a lower one.</p></div></div>
+    <div class="step"><div class="card"><p>When a lot's limit went up, demolitions there rose <b>2.16 times</b> as fast as on similar lots the city left alone. The pattern held in each of six rounds of rezoning between 2006 and 2024.</p><p class="note">95 percent interval: 1.85 to 2.53. Each round compares the three years before and after a rezoning.</p></div></div>
+    <div class="step"><div class="card"><p>When the limit went down, the demolition rate fell to <b>0.68 times</b> that of lots left alone.</p><p class="note">Two cautions: the city tends to raise limits where it already expects growth, and to lower them after waves of teardowns. Both can make the effects look larger.</p></div></div>
+    <div class="step"><div class="card"><p>In December 2024 the City Council adopted City of Yes for Housing Opportunity. Between the city's 2024 and 2026 lot records, about <b>541,000</b> lots with buildings got a higher limit, most of them through it.</p><p>If past patterns hold, our model expects about <b>4,300</b> demolitions over three years under the new limits, against about 2,500 under the old ones. The rules are too new to test.</p></div></div>
+    <div class="step tail"><div class="marker"></div></div>
+  </div>
+</section>
+
+<!-- =========================================================== 6. MAP AND LOOKUP -->
+<section id="lookup" aria-labelledby="lk-title">
+  <div class="lk-head">
+    <div class="kicker">Every lot in the city</div>
+    <h2 id="lk-title">Which lots look like the ones that came down?</h2>
+    <p>We scored all <span class="num">804,166</span> lots with a building in the five boroughs by how closely they resemble lots demolished in the past. Unused floor area carries the most weight; age, size, use, borough, landmark status and recent rezonings adjust it.</p>
+    <p>The score uses the limits in force before City of Yes, the version we could test. Trained on demolitions from 2008 to 2020, it put <b>61 percent</b> of the 2020–23 demolitions, which it had never seen, in the riskiest tenth of lots. Since January 2024, demolition has been filed for <span class="num">2,451</span> scored lots; 48 percent were in that tenth.</p>
+    <p class="note sans" style="font-size:.8rem;color:var(--mute)">A high score means a lot shares traits with past demolitions. It is not a forecast for any one building.</p>
+  </div>
+  <div class="lk-grid">
+    <div>
+      <div class="mapbox" id="mapbox">
+        <canvas id="c-map" aria-label="Map of demolition risk scores for every lot in New York City" role="img"></canvas>
+        <div class="mapload" id="mapload">Loading 804,166 lots…</div>
+        <div class="mapctl"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button><button type="button" id="zall" aria-label="Show the whole city" style="font-size:12px">All</button></div>
+        <div class="maphint" id="maphint">Drag to move · Ctrl + scroll or +/− to zoom · zoom in for single lots</div>
+        <div class="maptip" id="maptip"></div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="panel">
+      <label for="addr">Look up a lot</label>
+      <div class="search">
+        <select id="boro" aria-label="Borough"><option value="1">Manhattan</option><option value="2">Bronx</option><option value="3" selected>Brooklyn</option><option value="4">Queens</option><option value="5">Staten Island</option></select>
+        <input id="addr" type="search" autocomplete="off" placeholder="e.g. 335 Union Street" aria-describedby="lk-status">
+      </div>
+      <ul class="results" id="results" aria-label="Matching addresses"></ul>
+      <div class="status" id="lk-status" aria-live="polite">Type a house number and street, or click a lot on the map.</div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== 7. METHODS -->
+<section id="methods" aria-labelledby="m-title">
+  <div class="inner">
+    <h2 id="m-title">How this was done</h2>
+    <h3>Manhattan, 1889 to today</h3>
+    <p>Standing buildings are the city's building footprints (main buildings; detached garages and sheds left out). The number that have stood since 1889 adds the 1889 count of every building on the island to the new buildings planned or filed each year after: an 1898 real-estate history for 1889–1899, the Office for Metropolitan History's index of new-building applications for 1900–1986, and Department of Buildings permits for 1989–2026. Demolished = everything that stood minus what stands. Applications are not completions, so the share standing is an estimate; reasonable choices for the 1890s give 26 to 29 percent.</p>
+    <h3>Demolitions, 2002–2026, citywide</h3>
+    <p>Full demolitions from Department of Buildings job filings (BIS and DOB NOW) with a permit, matched by tax lot to the PLUTO lot file released just before each three-year window (nine releases, 2003 to 2026). Age is the year built on record, which is often rounded. FAR use is the lot's built floor area divided by the largest residential or commercial floor area its zoning allowed at the time.</p>
+    <h3>What replaced them</h3>
+    <p>For each demolished lot, the lot record about three to six years after the demolition window began. Of 28,409 demolitions with a later record, 63 percent had a new building, 20 percent had been merged into a larger lot and 17 percent were still empty. For the rebuilt lots, the share of the allowance in use is built floor area divided by the larger of the residential or commercial limit: before, under the limit at the time of the demolition; after, under the limit on record when the new building appeared (it had changed on 25 percent of lots). Measured against the earlier limit, the medians after are 98 to 104 percent. Shares above 100 percent mostly reflect zoning bonuses and community-facility allowances, which the limit used here leaves out.</p>
+    <h3>Damage</h3>
+    <p>Permitted full demolitions filed 2015–2025, checked against DOB unsafe-building, emergency and structurally compromised violations issued up to three years before the filing (and 30 days after), HPD vacate orders for fire damage or habitability, and filing descriptions naming fire, collapse, storm damage or an emergency.</p>
+    <h3>The model</h3>
+    <p>A weighted case-control logistic regression: all demolished lots and a 2 percent sample of the rest, weighted back to the full count. The rezoning test is a difference-in-differences: for lots with no zoning change in the previous round, it compares the change in demolition rates on rezoned lots with the change on lots left alone.</p>
+    <h3>The scores</h3>
+    <p>Each lot's score is the same model applied to the 2026 lot file, with the allowance as recorded in 2024. Tested out of time (trained 2008–2020, tested on August 2020 to July 2023), it scored an AUC of 0.851; its predictions ran a little high. The City of Yes figure applies the same model to the 2026 limits, which it was never trained on.</p>
+    <h3>Sources</h3>
+    <ul>
+      <li>NYC Open Data: <a href="https://data.cityofnewyork.us/d/5zhs-2jue">Building Footprints</a>, <a href="https://data.cityofnewyork.us/d/ic3t-wcy2">DOB Job Application Filings</a>, <a href="https://data.cityofnewyork.us/d/w9ak-ipjd">DOB NOW: Build Job Application Filings</a>, <a href="https://data.cityofnewyork.us/d/3h2n-5cm9">DOB Violations</a>, <a href="https://data.cityofnewyork.us/d/tb8q-a3ar">HPD Order to Repair/Vacate Orders</a>, <a href="https://data.cityofnewyork.us/d/gthc-hcne">Borough Boundaries</a></li>
+      <li>NYC Department of City Planning, <a href="https://www.nyc.gov/content/planning/pages/resources/datasets/mappluto-pluto-change">PLUTO and its archive</a></li>
+      <li><a href="https://www.metrohistory.com/permit-search">Office for Metropolitan History, building permit search</a> (Manhattan new-building applications, 1900–1986)</li>
+      <li><a href="https://archive.org/details/historyofrealest00durs">A History of Real Estate, Building and Architecture in New York City (1898)</a></li>
+      <li>Richard Howe, <a href="https://www.gothamcenter.org/blog/notes-on-manhattan-bricks">"Notes on Manhattan Bricks," Gotham Center</a> (1889 building count)</li>
+      <li><a href="https://therealdeal.com/magazine/new-york-february-2017/zoning-games/">The Real Deal, "Zoning games" (2017)</a> (2003–2007 rezonings)</li>
+      <li><a href="https://www.nyc.gov/site/planning/plans/city-of-yes/city-of-yes-housing-opportunity.page">NYC Planning, City of Yes for Housing Opportunity</a></li>
+      <li>Full method and results: <a href="https://claude.ai/artifact/8zwej5HB2DFq5Qq1mrDH23">Demolitions and unused FAR in NYC</a></li>
+    </ul>
+    <h3>Photographs</h3>
+    <ul>
+      <li>Historic American Buildings Survey, <a href="https://commons.wikimedia.org/wiki/File:808-810_SECOND_AVENUE_MAIN_ELEVATIONS_OF_BUILDINGS_-_United_Nations_Vicinity_Area_Study,_Second_Avenue,_East_Forty-first,_East_Forty-third,_East_Forty-fourth,_East_Forty-eighty,_HABS_NY,31-NEYO,152-2.tif">"808-810 Second Avenue main elevations of buildings"</a> (HABS NY-6254), United Nations Vicinity Area Study. Library of Congress, public domain.</li>
+      <li>Jim Henderson, <a href="https://commons.wikimedia.org/wiki/File:Wooden_House_1045_E15_Bklyn_2012_jeh.jpg">"Wooden House 1045 E15 Bklyn 2012"</a>, June 17, 2012. Wikimedia Commons, CC0.</li>
+      <li>All photographs converted to black and white and cropped.</li>
+    </ul>
+    <p class="foot">Demolition records are permits and filings, not confirmed completions. Lot records change between releases, and a few demolitions could not be matched to a lot.</p>
+  </div>
+</section>
+
+<script>
+'use strict';
+/* ======================================================================= helpers */
+const $ = s => document.querySelector(s);
+const clamp = (x, a = 0, b = 1) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+const easeIn = t => t * t * t;
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const hex2rgb = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+const mix = (a, b, t) => { const A = hex2rgb(a), B = hex2rgb(b); return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',')})`; };
+const INK = '#141414', RED = '#b0121b', PAPER = '#ffffff', MUTE = '#6c6662', RULE = '#e3dfdb';
+const RAMP = ['#d6d1cb', '#e8a08a', '#d9654f', '#bb3328', '#520a0e'];           // lots: <75th, 75-90, 90-95, 95-99, top 1%
+const HEXR = ['#e9e5e1', '#e8a08a', '#d9654f', '#bb3328', '#8e141a', '#520a0e'];  // hexes: share of lots in riskiest tenth
+const pctBand = p => p < 75 ? 0 : p < 90 ? 1 : p < 95 ? 2 : p < 99 ? 3 : 4;
+const dprOf = () => Math.min(2, window.devicePixelRatio || 1);
+
+async function gunzipB64(b64) {
+  const s = atob(b64), n = s.length, u = new Uint8Array(n);
+  for (let i = 0; i < n; i++) u[i] = s.charCodeAt(i);
+  if ('DecompressionStream' in window) {
+    const st = new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return new Uint8Array(await new Response(st).arrayBuffer());
+  }
+  await new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
+  return window.pako.ungzip(u);
+}
+
+/* ======================================================================= scroll engine
+   Each scene's progress t = sum over its step cards of how far each card has travelled
+   from the bottom of the viewport (0) to the middle (1). Draw functions are pure functions of t. */
+const scenes = [];
+function addScene(id, draw, resize) {
+  const el = document.getElementById(id);
+  const sc = { el, marks: [...el.querySelectorAll('.steps .card, .steps .marker')], draw, resize, t: -1, dirty: true };
+  scenes.push(sc); return sc;
+}
+// where a card comes to rest: mid-screen on wide screens, lower on phones so the graphic stays visible above it
+const restAt = () => innerWidth < 760 ? .7 : .5;
+window.__restAt = restAt;
+function sceneT(sc) {
+  const vh = innerHeight, rest = restAt(); let t = 0;
+  for (const m of sc.marks) {
+    const r = m.getBoundingClientRect(); const mid = r.top + Math.min(r.height, vh * .6) / 2;
+    const v = clamp((vh - mid) / (vh * (1 - rest))); t += RM ? (v > .5 ? 1 : 0) : v;
+  }
+  return t;
+}
+let ticking = false;
+function tick() {
+  ticking = false;
+  for (const sc of scenes) {
+    const r = sc.el.getBoundingClientRect();
+    if (r.bottom < -40 || r.top > innerHeight + 40) continue;
+    const t = sceneT(sc);
+    if (sc.dirty || Math.abs(t - sc.t) > 1e-4) { sc.t = t; sc.dirty = false; try { sc.draw(t); } catch (e) { console.error(e); } }
+  }
+}
+const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(tick); } };
+addEventListener('scroll', request, { passive: true });
+let rzTimer = 0;
+addEventListener('resize', () => { clearTimeout(rzTimer); rzTimer = setTimeout(() => { for (const sc of scenes) { sc.resize && sc.resize(); sc.dirty = true; } request(); }, 120); });
+
+/* ======================================================================= 1. OPENING */
+const OPEN = (() => {
+  const cv = $('#c-open'), ctx = cv.getContext('2d');
+  const NS = 44603, ND = 116434;
+  let D = null, L = null;
+  function setUnit(u) { document.querySelectorAll('.unitn').forEach(e => e.textContent = u); }
+  function layout() {
+    if (!D) return;
+    // full device resolution, and a backing store that maps 1:1 to screen pixels, so the grid never gets resampled
+    const stageEl = cv.parentElement, W = stageEl.clientWidth, H = stageEl.clientHeight, dpr = Math.min(3, window.devicePixelRatio || 1);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cv.style.width = (cv.width / dpr) + 'px'; cv.style.height = (cv.height / dpr) + 'px';
+    const wide = W >= 760;
+    let mnx = 1e9, mny = 1e9, mxx = -1e9, mxy = -1e9;
+    for (const r of D.outline) for (let i = 0; i < r.length; i += 2) { mnx = Math.min(mnx, r[i]); mxx = Math.max(mxx, r[i]); mny = Math.min(mny, r[i + 1]); mxy = Math.max(mxy, r[i + 1]); }
+    const bw = wide ? W * .36 : W * .78, bh = wide ? H * .86 : H * .5;
+    const k = Math.min(bw / (mxx - mnx), bh / (mxy - mny));
+    const cx = wide ? W * .66 : W * .5, cy = wide ? H * .5 : H * .7;
+    const ox = cx - k * (mnx + mxx) / 2, oy = cy + k * (mny + mxy) / 2;
+    const P = (x, y) => [ox + k * x, oy - k * y];
+    // island sprite (device pixels)
+    const sp = document.createElement('canvas'); sp.width = cv.width; sp.height = cv.height;
+    const g = sp.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const path = new Path2D();
+    for (const r of D.outline) { for (let i = 0; i < r.length; i += 2) { const [X, Y] = P(r[i], r[i + 1]); i ? path.lineTo(X, Y) : path.moveTo(X, Y); } path.closePath(); }
+    g.fillStyle = INK; g.fill(path, 'evenodd');
+    g.fillStyle = '#fff';
+    const pts = D.pts, nb = pts.length / 3, bx = new Float32Array(nb), by = new Float32Array(nb), bs = new Float32Array(nb);
+    for (let i = 0, j = 0; i < pts.length; i += 3, j++) {
+      const [X, Y] = P(pts[i], pts[i + 1]); const s = Math.max(1 / dpr, pts[i + 2] / 10 * k * .92);
+      bx[j] = X; by[j] = Y; bs[j] = s; g.fillRect(X - s / 2, Y - s / 2, s, s);
+    }
+    // grid of squares
+    let unit = 5, ns, nd, c;
+    const counts = u => [Math.round(NS / u), Math.round(ND / u)];
+    [ns, nd] = counts(5); c = Math.sqrt(W * H * .9 / (ns + nd));
+    if (c < 3.6) { unit = 10; [ns, nd] = counts(10); c = Math.sqrt(W * H * .9 / (ns + nd)); }
+    setUnit(unit);
+    let cols, rows, inside, dist, outside;
+    for (let iter = 0; iter < 40; iter++) {
+      // every cell a whole number of screen pixels, so all gaps between squares are identical
+      const cs = Math.max(2, Math.floor(c * dpr)) / dpr;
+      cols = Math.floor(W / cs); rows = Math.floor(H / cs);
+      // island mask at cell resolution
+      const m = document.createElement('canvas'); m.width = cols; m.height = rows; const mg = m.getContext('2d');
+      const gx0 = Math.round((W - cols * cs) / 2 * dpr) / dpr, gy0 = Math.round((H - rows * cs) / 2 * dpr) / dpr;
+      const c0 = c; c = cs;
+      mg.setTransform(1 / cs, 0, 0, 1 / cs, -gx0 / cs, -gy0 / cs); mg.fillStyle = '#000'; mg.fill(path, 'evenodd');
+      const a = mg.getImageData(0, 0, cols, rows).data; inside = new Uint8Array(cols * rows);
+      const touch = new Uint8Array(cols * rows);
+      for (let i = 0; i < touch.length; i++) touch[i] = a[i * 4 + 3] > 0 ? 1 : 0;
+      inside = new Uint8Array(cols * rows);
+      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+        let v = 0;
+        for (let dy = -1; dy <= 1 && !v; dy++) for (let dx = -1; dx <= 1 && !v; dx++) { const xx = x + dx, yy = y + dy; if (xx >= 0 && yy >= 0 && xx < cols && yy < rows && touch[yy * cols + xx]) v = 1; }
+        inside[y * cols + x] = v;
+      }
+      outside = 0; for (const v of inside) if (!v) outside++;
+      L = { gx0, gy0 };
+      if (outside >= nd && cols * rows >= ns + nd) break;
+      c = Math.min(c0 * .975, cs - .5 / dpr);
+    }
+    // chamfer distance from the island
+    const n = cols * rows; dist = new Float32Array(n).fill(1e9);
+    for (let i = 0; i < n; i++) if (inside[i]) dist[i] = 0;
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) { const i = y * cols + x; let d = dist[i];
+      if (x > 0) d = Math.min(d, dist[i - 1] + 1); if (y > 0) { d = Math.min(d, dist[i - cols] + 1); if (x > 0) d = Math.min(d, dist[i - cols - 1] + 1.414); if (x < cols - 1) d = Math.min(d, dist[i - cols + 1] + 1.414); } dist[i] = d; }
+    for (let y = rows - 1; y >= 0; y--) for (let x = cols - 1; x >= 0; x--) { const i = y * cols + x; let d = dist[i];
+      if (x < cols - 1) d = Math.min(d, dist[i + 1] + 1); if (y < rows - 1) { d = Math.min(d, dist[i + cols] + 1); if (x < cols - 1) d = Math.min(d, dist[i + cols + 1] + 1.414); if (x > 0) d = Math.min(d, dist[i + cols - 1] + 1.414); } dist[i] = d; }
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const cand = []; for (let i = 0; i < n; i++) if (!inside[i]) cand.push([dist[i] + rnd() * 1.6, i]);
+    cand.sort((p, q) => p[0] - q[0]);
+    const { gx0, gy0 } = L; const cellX = i => gx0 + (i % cols + .5) * c, cellY = i => gy0 + (Math.floor(i / cols) + .5) * c;
+    const cd = c * dpr, sqd = Math.max(2, Math.round(cd) - Math.max(1, Math.round(cd * .2)));
+    const sq = sqd / dpr;
+    // demolished squares
+    const D_ = { sx: new Float32Array(nd), sy: new Float32Array(nd), rx: new Float32Array(nd), ry: new Float32Array(nd), wx: new Float32Array(nd), wy: new Float32Array(nd), dl: new Float32Array(nd), wd: new Float32Array(nd), fd: new Float32Array(nd), fx: new Float32Array(nd) };
+    for (let i = 0; i < nd; i++) {
+      const b = Math.floor(rnd() * nb); D_.sx[i] = bx[b] + (rnd() - .5) * 3; D_.sy[i] = by[b] + (rnd() - .5) * 3;
+      const cell = cand[i % cand.length][1]; D_.rx[i] = cellX(cell); D_.ry[i] = cellY(cell); D_.dl[i] = i / nd;
+      const w = ns + i; D_.wx[i] = cellX(w); D_.wy[i] = cellY(w); D_.wd[i] = w / (ns + nd);
+      D_.fd[i] = rnd(); D_.fx[i] = (rnd() - .5) * 40;
+    }
+    // standing squares: one per `unit` buildings, starting at real building positions
+    const order = Array.from({ length: nb }, (_, i) => i); for (let i = nb - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+    const S_ = { sx: new Float32Array(ns), sy: new Float32Array(ns), ss: new Float32Array(ns), wx: new Float32Array(ns), wy: new Float32Array(ns), wd: new Float32Array(ns), fd: new Float32Array(ns), fx: new Float32Array(ns) };
+    for (let i = 0; i < ns; i++) { const b = order[i]; S_.sx[i] = bx[b]; S_.sy[i] = by[b]; S_.ss[i] = bs[b]; S_.wx[i] = cellX(i); S_.wy[i] = cellY(i); S_.wd[i] = i / (ns + nd); S_.fd[i] = rnd(); S_.fx[i] = (rnd() - .5) * 40; }
+    L = { W, H, dpr, sp, D_, S_, ns, nd, sq, c, cols, gx0, gy0, unit, wide, boundaryY: gy0 + Math.ceil(ns / cols) * c };
+    // label positions
+    const st = $('#ov-stand'), go = $('#ov-gone');
+    st.style.left = go.style.left = ''; st.style.right = go.style.right = 'max(16px,3vw)'; st.style.textAlign = go.style.textAlign = 'right';
+    st.style.top = Math.max(8, gy0 + 4) + 'px'; go.style.top = (L.boundaryY + 8) + 'px';
+  }
+  function draw(t) {
+    if (!L) return;
+    const { W, H, dpr, sp, D_, S_, ns, nd, sq } = L;
+    const bgT = ease(seg(t, 1.02, 1.4));
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = mix(PAPER, RED, bgT); ctx.fillRect(0, 0, cv.width, cv.height);
+    const islandA = 1 - ease(seg(t, 2.05, 2.45));
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const pr = seg(t, 1.05, 1.95), pw = seg(t, 2.05, 2.9), pf = seg(t, 3.0, 3.8);
+    // squares are drawn from the cell's top-left corner, which sits on a whole screen pixel; the gap is the cell's last pixel column and row
+    const R = v => Math.round(v * dpr), c2 = L.c / 2;
+    const fallY = H + 60;
+    // demolished: black
+    ctx.fillStyle = INK;
+    for (let i = 0; i < nd; i++) {
+      const a = clamp((pr - D_.dl[i] * .72) / .28); if (a <= 0) continue;
+      const ea = easeOut(a); let x = lerp(D_.sx[i], D_.rx[i], ea), y = lerp(D_.sy[i], D_.ry[i], ea); const s = sq * Math.min(1, .25 + a * 2);
+      if (pw > 0) { const b = ease(clamp((pw - D_.wd[i] * .55) / .45)); x = lerp(x, D_.wx[i], b); y = lerp(y, D_.wy[i], b); }
+      if (pf > 0) { const f = clamp((pf - D_.fd[i] * .55) / .45); if (f >= 1) continue; const e = easeIn(f); y += e * fallY; x += e * D_.fx[i]; }
+      const sd = Math.max(1, Math.round(s * dpr)); ctx.fillRect(R(x - c2), R(y - c2), sd, sd);
+    }
+    if (islandA > 0) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = islandA; ctx.drawImage(sp, 0, 0); ctx.globalAlpha = 1; }
+    // standing: white, from building positions to the grid
+    if (pw > 0) {
+      ctx.fillStyle = '#fff';
+      for (let i = 0; i < ns; i++) {
+        const b = ease(clamp((pw - S_.wd[i] * .55) / .45));
+        let x = lerp(S_.sx[i], S_.wx[i], b), y = lerp(S_.sy[i], S_.wy[i], b); const s = lerp(S_.ss[i], sq, b);
+        if (pf > 0) { const f = clamp((pf - S_.fd[i] * .55) / .45); if (f >= 1) continue; const e = easeIn(f); y += e * fallY; x += e * S_.fx[i]; }
+        const sd = Math.max(1, Math.round(s * dpr)); ctx.fillRect(R(x - c2), R(y - c2), sd, sd);
+      }
+    }
+    // overlays
+    $('#hero').style.opacity = 1 - seg(t, .15, .75);
+    $('#hero').style.visibility = t > .8 ? 'hidden' : 'visible';
+    $('#ov-legend').style.opacity = seg(t, 1.3, 1.7) * (1 - seg(t, 3.0, 3.3));
+    const lab = seg(t, 2.75, 2.95) * (1 - seg(t, 3.0, 3.2));
+    $('#ov-stand').style.opacity = lab; $('#ov-gone').style.opacity = lab;
+    $('#question').style.opacity = seg(t, 3.45, 3.85);
+  }
+  async function init() {
+    D = await fetch('data/manhattan.json').then(r => r.json());
+    layout(); sc.dirty = true; request();
+  }
+  const sc = addScene('open', draw, layout);
+  init();
+  return { layout };
+})();
+
+/* ======================================================================= charts (SVG strings) */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+function niceTicks(max, n = 4) { const raw = max / n, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p; const out = []; for (let v = 0; v <= max + 1e-9; v += step) out.push(+v.toFixed(6)); return out; }
+function chartBox(svg) {
+  const W = svg.clientWidth, H = svg.clientHeight, wide = W >= 760;
+  // desktop: right ~58% of the stage; phone: top ~58%
+  return wide ? { W, H, x0: W * .43, x1: W - Math.max(24, W * .05), y0: H * .17, y1: H * .8, wide } : { W, H, x0: 46, x1: W - 16, y0: 70, y1: H * .44, wide };
+}
+// grouped bars: groups [{title, bars:[{label, v, fill, op, val}]}], ymax, opts
+function barsSVG(B, groups, ymax, o) {
+  const { x0, x1, y0, y1 } = B; let s = '';
+  const nb = groups.reduce((a, g) => a + g.bars.length, 0), gap = groups.length > 1 ? 1.4 : 0;
+  const slot = (x1 - x0) / (nb + gap * (groups.length - 1)); const bw = Math.min(slot * .56, 64);
+  const Y = v => y1 - (y1 - y0) * v / ymax;
+  // title
+  s += `<text x="${x0 - 40}" y="${y0 - 34}" font-size="13" font-weight="700" fill="${INK}">${esc(o.title)}</text>`;
+  s += `<text x="${x0 - 40}" y="${y0 - 16}" font-size="12" fill="${MUTE}">${esc(o.sub)}</text>`;
+  for (const v of niceTicks(ymax * .98)) { const y = Y(v); s += `<line x1="${x0 - 6}" x2="${x1}" y1="${y}" y2="${y}" stroke="${v ? RULE : INK}" stroke-width="1"/><text x="${x0 - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="${MUTE}">${v}</text>`; }
+  let i = 0;
+  groups.forEach((g, gi) => {
+    const gx = x0 + slot * (i + gi * gap);
+    if (g.title && g.op > 0) { const ty = y1 + (slot >= 58 ? 46 : 74); const cx = gx + (g.bars.length * slot - slot * .36) / 2;
+      if (slot >= 58 || g.title.length < 18) s += `<text x="${cx}" y="${ty}" text-anchor="middle" font-size="12" font-weight="600" fill="${INK}" opacity="${g.op}">${esc(g.title)}</text>`;
+      else { const half = g.title.split(' '); const m = Math.ceil(half.length / 2); s += `<text x="${cx}" y="${ty}" text-anchor="middle" font-size="12" font-weight="600" fill="${INK}" opacity="${g.op}">${esc(half.slice(0, m).join(' '))}</text><text x="${cx}" y="${ty + 15}" text-anchor="middle" font-size="12" font-weight="600" fill="${INK}" opacity="${g.op}">${esc(half.slice(m).join(' '))}</text>`; } }
+    g.bars.forEach((b, bi) => {
+      const x = x0 + slot * (i + gi * gap) + (slot * .64 - bw) / 2; const h = Math.max(0, (y1 - y0) * b.v / ymax);
+      if (b.op > 0) {
+        const rr = Math.min(3, h / 2, bw / 2);
+        s += `<path d="M${x},${y1}V${y1 - h + rr}Q${x},${y1 - h} ${x + rr},${y1 - h}H${x + bw - rr}Q${x + bw},${y1 - h} ${x + bw},${y1 - h + rr}V${y1}Z" fill="${b.fill}" fill-opacity="${b.fo ?? 1}" opacity="${b.op}"${b.dash ? ` stroke="${b.fill}" stroke-width="1.5" stroke-dasharray="5 3"` : ''}/>`;
+        if (slot >= 58) s += `<text x="${x + bw / 2}" y="${y1 + 16}" text-anchor="middle" font-size="11" fill="${INK}" opacity="${b.op}">${esc(b.label)}</text>`;
+        else s += `<text transform="translate(${x + bw / 2 + 3},${y1 + 10}) rotate(-42)" text-anchor="end" font-size="10.5" fill="${INK}" opacity="${b.op}">${esc(b.label)}</text>`;
+        if (b.val && b.vo > 0) s += `<text x="${x + bw / 2}" y="${y1 - h - 6}" text-anchor="middle" font-size="12" font-weight="600" fill="${INK}" opacity="${b.vo * b.op}" class="num">${esc(b.val)}</text>`;
+      }
+      i++;
+    });
+  });
+  return s;
+}
+function bigNumber(B, num, cap, a) {
+  const x = B.wide ? B.x0 : B.x0 - 30, y = B.wide ? (B.y0 + B.y1) / 2 : B.y0 + 60;
+  return `<g opacity="${a}"><text x="${x}" y="${y}" style="font-family:var(--serif)" font-size="${B.wide ? 96 : 64}" font-weight="500" letter-spacing="-2" fill="${INK}">${esc(num)}</text>` +
+    wrapText(cap, x, y + 30, B.wide ? 46 : 38, 14, MUTE) + '</g>';
+}
+function wrapText(str, x, y, maxch, size, fill, weight = 400) {
+  const words = str.split(' '); const lines = []; let cur = '';
+  for (const w of words) { if ((cur + ' ' + w).trim().length > maxch) { lines.push(cur.trim()); cur = w; } else cur += ' ' + w; }
+  if (cur.trim()) lines.push(cur.trim());
+  return lines.map((l, i) => `<text x="${x}" y="${y + i * size * 1.35}" font-size="${size}" font-weight="${weight}" fill="${fill}">${esc(l)}</text>`).join('');
+}
+function waffleSVG(B, n, colorOf, opOf, caption, partial) {
+  const { x0, x1, y0, y1 } = B; const size = Math.min((x1 - x0), (y1 - y0) + 40) * .8; const c = size / 10, q = c * .82;
+  const ox = x0 + ((x1 - x0) - size) / 2, oy = y0 - 10;
+  let s = '';
+  for (let k = 0; k < 100; k++) { const col = k % 10, row = Math.floor(k / 10); const op = opOf(k); if (op <= 0) continue; s += `<rect x="${ox + col * c}" y="${oy + row * c}" width="${q}" height="${q}" fill="${colorOf(k)}" opacity="${op}"/>`;
+    if (partial && k === partial[0]) s += `<rect x="${ox + col * c}" y="${oy + row * c}" width="${q * partial[1]}" height="${q}" fill="${partial[2]}" opacity="${partial[3]}"/>`; }
+  if (caption) s += `<text x="${ox}" y="${oy + size + 22}" font-size="12" fill="${MUTE}">${esc(caption)}</text>`;
+  return { s, ox, oy, size, c };
+}
+
+/* ======================================================================= 2. SUSPECTS */
+const AGE = [['Before 1900', 5.18], ['1900–29', 6.27], ['1930–59', 4.91], ['1960–89', 2.11], ['1990 on', 1.82]];
+const FARB = [['Under 25%', 42.52], ['25–50%', 12.34], ['50–75%', 3.54], ['75–100%', 1.57], ['100%+', 1.04]];
+(() => {
+  const svg = $('#svg-sus');
+  /* a suspect's title beat: kicker, name, then two photos, staggered in; all out together */
+  function beat(el, t, t0, out) {
+    const o = 1 - seg(t, out, out + .28);
+    const parts = [['.bk', 0, 14], ['.bt', .06, 22], ['.f1', .13, 34], ['.f2', .2, 34]];
+    let any = 0;
+    for (const [q, d, dy] of parts) {
+      const p = ease(seg(t, t0 + d, t0 + d + .3)), a = p * o, n = el.querySelector(q);
+      n.style.opacity = a; n.style.transform = `translateY(${((1 - p) * dy).toFixed(1)}px)`; any = Math.max(any, a);
+    }
+    el.style.visibility = any > 0 ? 'visible' : 'hidden';
+  }
+  const elAge = $('#sus-age'), elDmg = $('#sus-dmg');
+  function draw(t) {
+    const B = chartBox(svg);
+    beat(elAge, t, 1.2, 2.0);
+    beat(elDmg, t, 5.2, 6.0);
+    const chartA = seg(t, 2.26, 2.52) * (1 - seg(t, 5.0, 5.2));
+    const grow = ease(seg(t, 2.28, 3.0));
+    const hiOld = seg(t, 3.05, 3.5) * (1 - seg(t, 4.02, 4.3)), hiNew = seg(t, 4.05, 4.5);
+    let s = '';
+    const introA = seg(t, .15, .5) * (1 - seg(t, 1.0, 1.18));
+    if (introA > 0) s += bigNumber(B, '30,424', 'lots with a permitted full demolition, August 2002 to January 2026, all five boroughs', introA);
+    if (chartA > 0) {
+      const bars = AGE.map(([l, v], i) => {
+        let fill = INK; let op = 1;
+        if (hiOld > 0 && i > 1) op = 1 - .7 * hiOld;
+        if (hiNew > 0 && i < 3) op = 1 - .7 * hiNew;
+        if (i === 0 && hiOld > 0) fill = mix(INK, RED, hiOld);
+        return { label: l, v: v * grow, fill, op, val: v.toFixed(1), vo: seg(t, 2.75, 3.0) };
+      });
+      s += `<g opacity="${chartA}">` + barsSVG(B, [{ title: 'By year built', op: 1, bars }], 7, { title: 'Demolitions per 1,000 lots', sub: 'in a three-year period, 2002–2026, by when the building was built' });
+      if (hiOld > 0) { const slot = (B.x1 - B.x0) / 5; s += `<text x="${B.x0 + slot * .32}" y="${B.y0 + 4}" font-size="13" font-weight="600" fill="${RED}" opacity="${hiOld}">Oldest, but torn down less often than 1900–29</text>`; }
+      if (hiNew > 0) { const slot = (B.x1 - B.x0) / 5; s += `<text x="${B.x0 + slot * 3}" y="${B.y0 + 4}" font-size="13" font-weight="600" fill="${RED}" opacity="${hiNew}">Newer buildings are spared</text>`; }
+      s += '</g>';
+    }
+    const wA = seg(t, 6.26, 6.55) * (1 - seg(t, 8.02, 8.3));
+    if (wA > 0) {
+      const lit = seg(t, 7.05, 7.45), dim = seg(t, 7.4, 7.8);
+      const W_ = waffleSVG(B, 100, k => k < 7 ? mix(INK, RED, lit) : INK, k => (k < 7 ? 1 : 1 - .75 * dim), '', [7, .8, mix(INK, RED, lit), 1]);
+      s += `<g opacity="${wA}">${W_.s}</g>`;
+      s += `<text x="${W_.ox}" y="${W_.oy - 14}" font-size="13" font-weight="700" fill="${INK}" opacity="${wA}">Full demolitions filed 2015–2025</text>`;
+      s += `<text x="${W_.ox}" y="${W_.oy + W_.size + 22}" font-size="12" fill="${RED}" font-weight="600" opacity="${lit * wA}">■ 7.8% with a recorded sign of damage or danger</text>`;
+      s += `<text x="${W_.ox}" y="${W_.oy + W_.size + 40}" font-size="12" fill="${MUTE}" opacity="${dim * wA}">■ 92.2% with none on record</text>`;
+    }
+    svg.innerHTML = s;
+    $('#reveal').style.opacity = seg(t, 8.1, 8.6);
+  }
+  addScene('suspects', draw);
+})();
+
+/* ======================================================================= one window for every drawn building
+   3 x 5.4 ft double-hung sash, four panes over four, with a lintel, a sill and the shadow of the head and jamb */
+const WIN = { w: 3.0, h: 5.4 };
+function windowModule(rect, segm, f, cx, z0, a, light) {
+  const w = WIN.w, h = WIN.h, z1 = z0 + h, L = light ? '#8c8c8c' : '#1c1c1c', x0 = cx - w / 2, x1 = cx + w / 2, i = .24, zm = (z0 + z1) / 2;
+  rect(f, x0 - .4, z1 + .12, x1 + .4, z1 + .8, { fill: '#ffffff', stroke: L, lw: .55, alpha: a });                          // lintel
+  rect(f, x0 - .28, z0 - .42, x1 + .28, z0 - .08, { fill: '#ffffff', stroke: L, lw: .55, alpha: a });                       // sill
+  rect(f, x0, z0, x1, z1, { fill: '#ffffff', stroke: L, lw: .7, alpha: a });                                              // frame
+  rect(f, x0 + i, z0 + i, x1 - i, z1 - i, { fill: light ? '#cdcdcd' : '#8e8e8e', stroke: L, lw: .5, alpha: a,
+    hatch: light ? [] : [{ type: 'd', sp: .38, color: 'rgba(0,0,0,.32)', lw: .35 }] });                                      // glass
+  if (!light) {
+    rect(f, x0 + i, z1 - i - .38, x1 - i, z1 - i, { fill: '#4a4a4a', stroke: null, alpha: a * .85 });                       // shadow under the head
+    rect(f, x0 + i, z0 + i, x0 + i + .22, z1 - i, { fill: '#4a4a4a', stroke: null, alpha: a * .55 });                        // shadow of the jamb
+  }
+  rect(f, x0 + i, zm - .1, x1 - i, zm + .1, { fill: '#ffffff', stroke: L, lw: .45, alpha: a });                             // meeting rail
+  segm(f, cx, z0 + i, cx, z1 - i, { stroke: L, lw: .7, alpha: a });                                                       // mullion
+  for (const zz of [(z0 + i + zm) / 2, (zm + z1 - i) / 2]) segm(f, x0 + i, zz, x1 - i, zz, { stroke: L, lw: .45, alpha: a });  // muntins
+}
+
+/* ======================================================================= 3. BROWNSTONE (hand-rolled axonometric, technical-drawing style) */
+(() => {
+  const cv = $('#c-house'), ctx = cv.getContext('2d'), ovl = $('#house-ov');
+  // line drawing: ink linework with light shading, red for everything measured
+  const PLATE = '#ffffff', LINE = '#1c1c1c', LINE2 = '#8c8c8c', ACC = RED;
+  const accA = a => `rgba(176,18,27,${a})`;
+  const TONE = {
+    house: { f: '#f5f5f5', s: '#c9c9c9', t: '#e6e6e6' },
+    trim: { f: '#ffffff', s: '#d9d9d9', t: '#ededed' },
+    nb: { f: '#f3f3f3', s: '#e0e0e0', t: '#f0f0f0' },
+    glass: '#8e8e8e'
+  };
+  const LBL = {};
+  for (const [k, cls, txt] of [['w', 'hl red', '20 ft'], ['d', 'hl red', '100 ft'], ['lot', 'hl red tag', 'Lot: 2,000 sq ft'],
+    ['f0', 'hl left', '1,000 sq ft'], ['f1', 'hl left', '1,000 sq ft'], ['f2', 'hl left', '1,000 sq ft'], ['f3', 'hl left', '1,000 sq ft'],
+    ['tot', 'hl left red', 'Total: 4,000 sq ft'], ['gh', 'hl left red', 'Allowed at FAR 4.0: 8,000 sq ft'], ['un', 'hl left red', 'Unused: 4,000 sq ft'],
+    ['lim', 'hl left red', 'At FAR 2.0: 4,000 sq ft allowed, all of it used']]) {
+    const e = document.createElement('div'); e.className = cls; e.textContent = txt; ovl.appendChild(e); LBL[k] = e;
+  }
+  let W = 0, H = 0, dpr = 1;
+  function resize() { W = cv.clientWidth; H = cv.clientHeight; dpr = dprOf(); cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  // ------------------------------------------------ vectors
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k], len = a => Math.hypot(a[0], a[1], a[2]);
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  // hatch lines that lie on a rectangular face, in feet, so they stay put as the camera turns
+  function hatchLines(pts, h) {
+    const [p0, p1, , p3] = pts; const U = sub(p1, p0), V = sub(p3, p0); const w = len(U), hh = len(V);
+    if (w < 1e-6 || hh < 1e-6) return [];
+    const u = mul(U, 1 / w), v = mul(V, 1 / hh), s = h.sp, out = [];
+    const P = (a, b) => add(p0, add(mul(u, a), mul(v, b)));
+    if (h.type === 'h' || h.type === 'grid') for (let b = s; b < hh - 1e-6; b += s) out.push([P(0, b), P(w, b)]);
+    if (h.type === 'v' || h.type === 'grid') for (let a = s; a < w - 1e-6; a += s) out.push([P(a, 0), P(a, hh)]);
+    if (h.type === 'd') for (let c = -hh + s / 2; c < w; c += s) { const a0 = Math.max(0, c), a1 = Math.min(w, c + hh); if (a1 > a0) out.push([P(a0, a0 - c), P(a1, a1 - c)]); }
+    return out;
+  }
+  // ------------------------------------------------ geometry
+  // a face: pts, normal, fill, stroke, lw, alpha, layer, hatch list, decals (drawn on top of the face, same order)
+  let F = [];
+  function face(pts, n, o) { const f = Object.assign({ pts, n, alpha: 1, layer: 1, lw: .8, stroke: LINE, hatch: [], dec: [] }, o); F.push(f); return f; }
+  function box(x0, y0, z0, x1, y1, z1, tone, o = {}) {
+    const base = Object.assign({}, o); delete base.sideHatch; delete base.frontHatch; delete base.topHatch;
+    const fr = face([[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]], [0, -1, 0], Object.assign({ fill: tone.f, hatch: o.frontHatch ? [o.frontHatch] : [] }, base));
+    face([[x1, y1, z0], [x0, y1, z0], [x0, y1, z1], [x1, y1, z1]], [0, 1, 0], Object.assign({ fill: tone.s }, base));
+    face([[x0, y1, z0], [x0, y0, z0], [x0, y0, z1], [x0, y1, z1]], [-1, 0, 0], Object.assign({ fill: tone.s, hatch: o.sideHatch ? [o.sideHatch] : [] }, base));
+    const rt = face([[x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]], [1, 0, 0], Object.assign({ fill: tone.s, hatch: o.sideHatch ? [o.sideHatch] : [] }, base));
+    const tp = face([[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], [0, 0, 1], Object.assign({ fill: tone.t, hatch: o.topHatch ? [o.topHatch] : [] }, base));
+    return { fr, rt, tp };
+  }
+  // decal rectangle on a front face (x across, z up), nudged toward the viewer
+  const rect = (f, x0, z0, x1, z1, o) => f.dec.push(Object.assign({ pts: [[x0, -.05, z0], [x1, -.05, z0], [x1, -.05, z1], [x0, -.05, z1]], fill: null, stroke: LINE, lw: .55, alpha: 1, hatch: [] }, o));
+  const segm = (f, x0, z0, x1, z1, o) => f.dec.push(Object.assign({ line: [[x0, -.06, z0], [x1, -.06, z1]], stroke: LINE, lw: .55, alpha: 1 }, o));
+  const windowOn = (f, cx, z0, a, light) => windowModule(rect, segm, f, cx, z0, a, light);
+  const FLOORS = [[0, 10], [10, 22], [22, 32], [32, 41]];
+  const BAYS = [3.8, 10, 16.2];
+  const coursing = { type: 'h', sp: 1.65, color: 'rgba(20,20,20,.16)', lw: .45 };
+  const sideShade = { type: 'd', sp: 1.1, color: 'rgba(20,20,20,.32)', lw: .45 };
+  function buildScene(p) {
+    F = []; const G = [];   // G: ground linework, drawn before any solid
+    // street furniture as lines only: curb, property line, sidewalk joints
+    G.push({ a: [-46, -16.6, 0], b: [66, -16.6, 0], c: LINE, lw: .7 }, { a: [-46, -16, 0], b: [66, -16, 0], c: LINE, lw: .7 }, { a: [-46, 0, 0], b: [66, 0, 0], c: LINE2, lw: .5 });
+    for (let x = -45; x <= 65; x += 5) G.push({ a: [x, -16, 0], b: [x, 0, 0], c: 'rgba(20,20,20,.18)', lw: .45 });
+    for (const x of [-40, -20, 20, 40, 60]) G.push({ a: [x, 0, 0], b: [x, 50, 0], c: 'rgba(20,20,20,.25)', lw: .45 });
+    if (p.lotA > 0) {
+      for (let y = 5; y < 100; y += 5) G.push({ a: [0, y, 0], b: [20, y, 0], c: accA(.38 * p.lotA), lw: .5 });
+      for (let x = 5; x < 20; x += 5) G.push({ a: [x, 0, 0], b: [x, 100, 0], c: accA(.38 * p.lotA), lw: .5 });
+      for (const [a, b] of [[[0, 0, 0], [20, 0, 0]], [[20, 0, 0], [20, 100, 0]], [[20, 100, 0], [0, 100, 0]], [[0, 100, 0], [0, 0, 0]]]) G.push({ a, b, c: accA(p.lotA), lw: 1.4, dash: [6, 4] });
+    }
+    // neighbours, drawn lighter
+    if (p.nbA > 0) {
+      const NB = [[-40, -20, 44, 48], [-20, 0, 40, 50], [20, 40, 38, 50], [40, 60, 44, 46]];
+      for (const [x0, x1, h, d] of NB) {
+        const hh = h * p.build; if (hh <= .2) continue;
+        const b = box(x0, 0, 0, x1, d, hh, TONE.nb, { alpha: p.nbA, stroke: LINE2, lw: .6, sideHatch: { type: 'd', sp: 1.4, color: 'rgba(20,20,20,.18)', lw: .4 } });
+        const a = p.nbA * seg(p.build, .9, 1);
+        if (a > 0) for (const z0 of [2.4, 13.3, 24.3, 33.8]) for (const cx of [x0 + 3.8, x0 + 10, x0 + 16.2]) { if (z0 + WIN.h + .8 > hh - 2.2) continue; windowOn(b.fr, cx, z0, a, true); }
+        if (a > 0) rect(b.fr, x0, hh - 2.2, x1, hh - .2, { fill: TONE.nb.f, stroke: LINE2, lw: .45, alpha: a });
+      }
+    }
+    // the brownstone, floor by floor
+    const gap = 7 * p.explode; let topZ = 0;
+    FLOORS.forEach(([z0, z1], i) => {
+      const bi = clamp(p.build * 4 - i); if (bi <= 0) return;
+      const dz = i * gap, zt = z0 + (z1 - z0) * bi;
+      const slab = p.slabA > 0 ? { type: 'grid', sp: 2.5, color: accA(.55 * p.slabA), lw: .5 } : null;
+      const b = box(0, 0, z0 + dz, 20, 50, zt + dz, TONE.house, { lw: .9, frontHatch: coursing, sideHatch: sideShade, topHatch: slab });
+      if (p.slabA > 0) { b.tp.stroke = mix(LINE, ACC, p.slabA); b.tp.lw = .9 + .6 * p.slabA; }
+      topZ = zt + dz;
+      const wa = seg(bi, .85, 1); if (wa <= 0) return;
+      if (i === 0) {
+        windowOn(b.fr, 10, 2.4 + dz, wa); windowOn(b.fr, 16.2, 2.4 + dz, wa);
+        rect(b.fr, 2.6, dz, 5.2, 6.8 + dz, { fill: '#ababab', stroke: LINE, lw: .6, alpha: wa, hatch: [{ type: 'v', sp: .65, color: 'rgba(20,20,20,.35)', lw: .4 }] });   // gate under the stoop
+      }
+      if (i === 1) {
+        windowOn(b.fr, 10, 13.3 + dz, wa); windowOn(b.fr, 16.2, 13.3 + dz, wa);
+        rect(b.fr, 1.8, 10 + dz, 5.8, 21 + dz, { fill: TONE.trim.f, stroke: LINE, lw: .7, alpha: wa });                       // door surround
+        rect(b.fr, 2.3, 10 + dz, 5.3, 18.8 + dz, { fill: '#a8a8a8', stroke: LINE, lw: .6, alpha: wa });                       // doors
+        segm(b.fr, 3.8, 10 + dz, 3.8, 18.8 + dz, { lw: .6, alpha: wa });
+        for (const [xa, xb] of [[2.6, 3.5], [4.1, 5.0]]) { rect(b.fr, xa, 11 + dz, xb, 14.3 + dz, { alpha: wa, lw: .45 }); rect(b.fr, xa, 14.9 + dz, xb, 18.2 + dz, { alpha: wa, lw: .45 }); }
+        rect(b.fr, 2.3, 19.2 + dz, 5.3, 20.4 + dz, { fill: TONE.glass, stroke: LINE, lw: .5, alpha: wa, hatch: [{ type: 'd', sp: .4, color: 'rgba(20,20,20,.45)', lw: .4 }] });   // transom
+      }
+      if (i === 2) for (const cx of BAYS) windowOn(b.fr, cx, 24.3 + dz, wa);
+      if (i === 3) for (const cx of BAYS) windowOn(b.fr, cx, 33.8 + dz, wa);
+      rect(b.fr, 0, zt - .55 + dz, 20, zt + dz, { fill: TONE.trim.f, stroke: LINE, lw: .55, alpha: wa });                       // string course
+      if (i === 3 && bi >= 1) {
+        const cz = 41 + dz, ca = seg(p.build, .97, 1);
+        if (ca > 0) {
+          const cb = box(-.3, -1.7, cz, 20.3, 0, cz + 2.7, TONE.trim, { alpha: ca, layer: 2, lw: .9, sideHatch: sideShade });
+          rect(cb.fr, -.3, cz + 2.0, 20.3, cz + 2.7, { fill: TONE.trim.f, alpha: ca, lw: .55 });                                // crown
+          for (let x = .3; x < 20; x += .9) segm(cb.fr, x, cz + 1.6, x, cz + 1.95, { alpha: ca, lw: .45 });                     // dentils
+          for (let x = .6; x < 20; x += 2.35) rect(cb.fr, x, cz + .15, x + .55, cz + 1.6, { fill: '#c6c6c6', alpha: ca, lw: .5 }); // brackets
+          topZ = cz + 2.7;
+        }
+      }
+    });
+    // stoop
+    const sa = seg(p.build, .45, .7) * (1 - seg(p.explode, 0, .35));
+    if (sa > 0) {
+      const n = 8, tread = 1.4;
+      for (let k = 0; k < n; k++) box(1.7, -12 + k * tread, 0, 6.1, -12 + (k + 1) * tread, (k + 1) * 1.25, TONE.house, { alpha: sa, layer: 2, lw: .7, sideHatch: sideShade });
+      box(1.7, -12 + n * tread, 0, 6.1, 0, 10, TONE.house, { alpha: sa, layer: 2, lw: .7, sideHatch: sideShade });
+      face([[6.25, -12.2, 2.0], [6.25, -0.6, 12.4], [6.25, -0.6, 13.2], [6.25, -12.2, 2.8]], [1, 0, 0], { fill: '#555555', alpha: sa, layer: 2, lw: .6 });   // handrail
+      for (let k = 1; k < 8; k++) { const yy = -12.2 + k * 1.45, zz = 2.0 + k * 1.3; face([[6.25, yy, zz - 2.6], [6.25, yy + .18, zz - 2.6 + .16], [6.25, yy + .18, zz + .16], [6.25, yy, zz]], [1, 0, 0], { fill: '#555555', alpha: sa, layer: 2, lw: .3 }); }   // balusters
+      box(5.9, -12.8, 0, 6.6, -11.9, 3.8, TONE.trim, { alpha: sa, layer: 2, lw: .7 });                                          // newel
+    }
+    // the allowance, drawn as outline floors above the house
+    const ghosts = [];
+    for (let j = 0; j < 4; j++) {
+      const a = p.ghost[j]; if (a <= 0) continue;
+      const k = 4 + j, z0 = 43.6 + j * 10 + (k - 1) * gap * .9 + gap * .4, z1 = z0 + 10;
+      const fillA = (.05 + .07 * p.valueA) * a;
+      const grid = { type: 'grid', sp: 2.5, color: accA(.4 * a), lw: .45 };
+      const g = box(0, 0, z0, 20, 50, z1, { f: accA(fillA), s: accA(fillA), t: accA(fillA) }, { layer: 3, stroke: accA(.95 * a), lw: 1.1, frontHatch: grid, sideHatch: grid, topHatch: grid });
+      ghosts.push([z0, z1, a]);
+    }
+    return { topZ, ghosts, G };
+  }
+  // ------------------------------------------------ camera
+  function camera(yawDeg, pitchDeg) {
+    const a = yawDeg * Math.PI / 180, ph = pitchDeg * Math.PI / 180;
+    const v = [-Math.sin(a) * Math.cos(ph), -Math.cos(a) * Math.cos(ph), Math.sin(ph)];
+    const f = [-v[0], -v[1], -v[2]];
+    let r = [f[1], -f[0], 0]; const rl = Math.hypot(r[0], r[1]); r = [r[0] / rl, r[1] / rl, 0];
+    const u = [r[1] * f[2], -r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+    return { v, f, r, u };
+  }
+  function draw(t) {
+    if (!W) resize();
+    const p = {
+      build: ease(seg(t, 1.1, 1.85)),
+      nbA: lerp(1, .3, seg(t, 2.0, 2.5)),
+      lotA: seg(t, 2.05, 2.6),
+      explode: ease(seg(t, 3.05, 3.8)) * (1 - ease(seg(t, 7.05, 7.6))),
+      slabA: seg(t, 3.4, 3.8) * (1 - seg(t, 7.05, 7.4)),
+      ghost: [0, 1, 2, 3].map(j => ease(seg(t, 5.1 + j * .14, 5.45 + j * .14)) * (1 - ease(seg(t, 7.05, 7.5)))),
+      valueA: seg(t, 6.05, 6.5) * (1 - seg(t, 7.02, 7.2))
+    };
+    const wide = W >= 760;
+    const cam = camera(lerp(-28, -40, seg(t, .9, 8)), lerp(24, 30, seg(t, 1, 6)));
+    const { topZ, ghosts, G } = buildScene(p);
+    const zTop = Math.max(46, ...ghosts.map(g => g[1]), topZ + 4);
+    const fitPts = [[-4, -16, 0], [24, -16, 0], [-4, 100, 0], [24, 100, 0], [0, 0, zTop], [20, 50, zTop], [30, 0, 0]];
+    let mnX = 1e9, mxX = -1e9, mnY = 1e9, mxY = -1e9;
+    for (const q of fitPts) { const X = dot(q, cam.r), Y = -dot(q, cam.u); mnX = Math.min(mnX, X); mxX = Math.max(mxX, X); mnY = Math.min(mnY, Y); mxY = Math.max(mxY, Y); }
+    const tgt = wide ? { x0: W * .42, x1: W * .95, y0: H * .09, y1: H * .84 } : { x0: W * .06, x1: W * .94, y0: H * .05, y1: H * .52 };
+    const s = Math.min((tgt.x1 - tgt.x0) / (mxX - mnX), (tgt.y1 - tgt.y0) / (mxY - mnY));
+    const ox = (tgt.x0 + tgt.x1) / 2 - s * (mnX + mxX) / 2, oy = (tgt.y0 + tgt.y1) / 2 - s * (mnY + mxY) / 2;
+    const PR = q => [ox + s * dot(q, cam.r), oy - s * dot(q, cam.u)];
+    const lwk = clamp(s / 9, .75, 1.35);   // line weight follows drawing scale a little
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = PLATE; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    const sceneA = seg(t, 1.02, 1.3);
+    const path = pts => { ctx.beginPath(); pts.forEach((q, i) => { const [X, Y] = PR(q); i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }); ctx.closePath(); };
+    const strokeLines = (lines, color, lw, alpha) => { if (!lines.length) return; ctx.globalAlpha = alpha; ctx.strokeStyle = color; ctx.lineWidth = lw * lwk; ctx.beginPath(); for (const [a, b] of lines) { const A = PR(a), B = PR(b); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); } ctx.stroke(); };
+    // ground linework
+    for (const g of G) { ctx.setLineDash(g.dash || []); strokeLines([[g.a, g.b]], g.c, g.lw, sceneA); }
+    ctx.setLineDash([]);
+    // solids, painter's order within layers
+    const vis = F.map((f, i) => [f, i]).filter(([f]) => dot(f.n, cam.v) > 1e-6).map(([f, i]) => { let d = 0; for (const q of f.pts) d += dot(q, cam.f); return [f, d / f.pts.length, i]; });
+    vis.sort((a, b) => (a[0].layer - b[0].layer) || (b[1] - a[1]));
+    for (const [f] of vis) {
+      const A = sceneA * f.alpha;
+      path(f.pts); ctx.globalAlpha = A; ctx.fillStyle = f.fill; ctx.fill();
+      for (const h of f.hatch) if (h) { ctx.save(); path(f.pts); ctx.clip(); strokeLines(hatchLines(f.pts, h), h.color, h.lw, A); ctx.restore(); }
+      if (f.stroke) { path(f.pts); ctx.globalAlpha = A; ctx.strokeStyle = f.stroke; ctx.lineWidth = f.lw * lwk; ctx.stroke(); }
+      const y0 = f.pts[0][1];
+      for (const d of f.dec) {
+        const da = A * d.alpha; if (da <= 0) continue;
+        if (d.line) { strokeLines([[[d.line[0][0], y0 + d.line[0][1], d.line[0][2]], [d.line[1][0], y0 + d.line[1][1], d.line[1][2]]]], d.stroke, d.lw, da); continue; }
+        const pts = d.pts.map(q => [q[0], y0 + q[1], q[2]]);
+        if (d.fill) { path(pts); ctx.globalAlpha = da; ctx.fillStyle = d.fill; ctx.fill(); }
+        for (const h of d.hatch) { ctx.save(); path(pts); ctx.clip(); strokeLines(hatchLines(pts, h), h.color, h.lw, da); ctx.restore(); }
+        if (d.stroke) { path(pts); ctx.globalAlpha = da; ctx.strokeStyle = d.stroke; ctx.lineWidth = d.lw * lwk; ctx.stroke(); }
+      }
+    }
+    ctx.globalAlpha = 1;
+    // dimension lines: extension lines, dimension line, architectural ticks
+    const dimA = seg(t, 2.2, 2.7) * (1 - seg(t, 5.02, 5.3));
+    if (dimA > 0) {
+      const tick = (q, dir) => { const a = add(q, mul(dir, -1.1)), b = add(q, mul(dir, 1.1)); strokeLines([[a, b]], ACC, 1.3, dimA); };
+      strokeLines([[[0, -1, 0], [0, -15.8, 0]], [[20, -1, 0], [20, -15.8, 0]], [[21, 0, 0], [28.6, 0, 0]], [[21, 100, 0], [28.6, 100, 0]]], accA(.7), .5, dimA);
+      strokeLines([[[0, -14.5, 0], [20, -14.5, 0]], [[27, 0, 0], [27, 100, 0]]], ACC, .9, dimA);
+      tick([0, -14.5, 0], [.707, .707, 0]); tick([20, -14.5, 0], [.707, .707, 0]); tick([27, 0, 0], [.707, .707, 0]); tick([27, 100, 0], [.707, .707, 0]);
+    }
+    const place = (el, q, a, dx = 0, dy = 0) => { el.style.opacity = a; if (a > 0) { const [X, Y] = PR(q); let x = X + dx; const w = el.offsetWidth; const left = el.classList.contains('left'); if (left && x + w > W - 8) x = Math.max(8, W - 8 - w); if (!left && x + w / 2 > W - 8) x = W - 8 - w / 2; el.style.left = x + 'px'; el.style.top = (Y + dy) + 'px'; } };
+    place(LBL.w, [10, -14.5, 0], dimA, 0, 16);
+    place(LBL.d, [27, 50, 0], dimA, 34, 0);
+    place(LBL.lot, [10, 76, 0], p.lotA * (1 - seg(t, 5.02, 5.3)));
+    const fa = p.slabA * (1 - seg(t, 5.02, 5.3));
+    FLOORS.forEach(([z0, z1], i) => place(LBL['f' + i], [20, 50, z1 + i * 7 * p.explode], fa, 12, 0));
+    place(LBL.tot, [20, 50, 41 + 3 * 7 * p.explode], fa * seg(t, 3.7, 4.0), 12, -30);
+    const gA = seg(t, 5.5, 5.85) * (1 - seg(t, 7.02, 7.25));
+    const gTop = ghosts.length ? ghosts[ghosts.length - 1][1] : 80;
+    place(LBL.gh, [20, 50, gTop], gA, 12, 0);
+    place(LBL.un, [20, 50, ghosts.length ? (ghosts[0][0] + gTop) / 2 : 60], gA * seg(t, 5.7, 6.0), 12, 0);
+    place(LBL.lim, [20, 50, topZ], seg(t, 7.35, 7.7), 12, -12);
+    // FAR letters and the equation
+    const lettersA = 1 - seg(t, 1.02, 1.3);
+    const fl = $('#far-letters'); fl.style.opacity = lettersA; fl.style.visibility = lettersA > 0 ? 'visible' : 'hidden';
+    fl.querySelectorAll('.rest').forEach((e, i) => { const a = seg(t, .12 + i * .1, .4 + i * .1); e.style.opacity = a; e.style.transform = `translateY(${(1 - a) * 10}px)`; });
+    fl.style.justifyContent = wide ? 'flex-end' : 'center'; fl.style.paddingRight = wide ? '8vw' : '0';
+    if (!wide) { fl.style.alignItems = 'flex-start'; fl.style.paddingTop = '14vh'; } else { fl.style.alignItems = 'center'; fl.style.paddingTop = '0'; }
+    const eq = $('#equation'); const ea = seg(t, 4.1, 4.5) * (1 - seg(t, 5.02, 5.3)); eq.style.opacity = ea;
+    if (wide) { eq.style.left = (W * .45) + 'px'; eq.style.top = (H * .08) + 'px'; } else { eq.style.left = '16px'; eq.style.top = (H * .02) + 'px'; }
+    $('#illus').style.opacity = seg(t, 5.3, 5.6);
+  }
+  addScene('far', draw, resize);
+})();
+
+/* ======================================================================= small axonometric line-drawing kit (same look as the brownstone) */
+const AXO = (() => {
+  const LINE = '#1c1c1c', LINE2 = '#8c8c8c';
+  const TONE = { house: { f: '#f5f5f5', s: '#c9c9c9', t: '#e6e6e6' }, trim: { f: '#ffffff', s: '#d9d9d9', t: '#ededed' }, glass: '#8e8e8e' };
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k], len = a => Math.hypot(a[0], a[1], a[2]);
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const coursing = { type: 'h', sp: 1.65, color: 'rgba(20,20,20,.16)', lw: .45 };
+  const sideShade = { type: 'd', sp: 1.1, color: 'rgba(20,20,20,.32)', lw: .45 };
+  const glassHatch = { type: 'd', sp: .42, color: 'rgba(20,20,20,.45)', lw: .4 };
+  function hatchLines(pts, h) {
+    const [p0, p1, , p3] = pts; const U = sub(p1, p0), V = sub(p3, p0); const w = len(U), hh = len(V);
+    if (w < 1e-6 || hh < 1e-6) return [];
+    const u = mul(U, 1 / w), v = mul(V, 1 / hh), s = h.sp, out = [];
+    const P = (a, b) => add(p0, add(mul(u, a), mul(v, b)));
+    if (h.type === 'h' || h.type === 'grid') for (let b = s; b < hh - 1e-6; b += s) out.push([P(0, b), P(w, b)]);
+    if (h.type === 'v' || h.type === 'grid') for (let a = s; a < w - 1e-6; a += s) out.push([P(a, 0), P(a, hh)]);
+    if (h.type === 'd') for (let c = -hh + s / 2; c < w; c += s) { const a0 = Math.max(0, c), a1 = Math.min(w, c + hh); if (a1 > a0) out.push([P(a0, a0 - c), P(a1, a1 - c)]); }
+    return out;
+  }
+  function scene() {
+    const F = [];
+    const face = (pts, n, o) => { const f = Object.assign({ pts, n, alpha: 1, layer: 1, lw: .8, stroke: LINE, hatch: [], dec: [] }, o); F.push(f); return f; };
+    function box(x0, y0, z0, x1, y1, z1, tone, o = {}) {
+      const base = Object.assign({}, o); delete base.sideHatch; delete base.frontHatch; delete base.topHatch;
+      const fr = face([[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]], [0, -1, 0], Object.assign({ fill: tone.f, hatch: o.frontHatch ? [o.frontHatch] : [] }, base));
+      face([[x0, y1, z0], [x0, y0, z0], [x0, y0, z1], [x0, y1, z1]], [-1, 0, 0], Object.assign({ fill: tone.s, hatch: o.sideHatch ? [o.sideHatch] : [] }, base));
+      face([[x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]], [1, 0, 0], Object.assign({ fill: tone.s, hatch: o.sideHatch ? [o.sideHatch] : [] }, base));
+      face([[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], [0, 0, 1], Object.assign({ fill: tone.t, hatch: o.topHatch ? [o.topHatch] : [] }, base));
+      return { fr };
+    }
+    const rect = (f, x0, z0, x1, z1, o) => f.dec.push(Object.assign({ pts: [[x0, -.05, z0], [x1, -.05, z0], [x1, -.05, z1], [x0, -.05, z1]], fill: null, stroke: LINE, lw: .55, alpha: 1, hatch: [] }, o));
+    const segm = (f, x0, z0, x1, z1, o) => f.dec.push(Object.assign({ line: [[x0, -.06, z0], [x1, -.06, z1]], stroke: LINE, lw: .55, alpha: 1 }, o));
+    const windowOn = (f, cx, z0, a, light) => windowModule(rect, segm, f, cx, z0, a, light);
+    return { F, face, box, rect, segm, windowOn };
+  }
+  function camera(yawDeg, pitchDeg) {
+    const a = yawDeg * Math.PI / 180, ph = pitchDeg * Math.PI / 180;
+    const v = [-Math.sin(a) * Math.cos(ph), -Math.cos(a) * Math.cos(ph), Math.sin(ph)];
+    const f = [-v[0], -v[1], -v[2]];
+    let r = [f[1], -f[0], 0]; const rl = Math.hypot(r[0], r[1]); r = [r[0] / rl, r[1] / rl, 0];
+    const u = [r[1] * f[2], -r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+    return { v, f, r, u };
+  }
+  function fit(cam, pts, tgt) {
+    let mnX = 1e9, mxX = -1e9, mnY = 1e9, mxY = -1e9;
+    for (const q of pts) { const X = dot(q, cam.r), Y = -dot(q, cam.u); mnX = Math.min(mnX, X); mxX = Math.max(mxX, X); mnY = Math.min(mnY, Y); mxY = Math.max(mxY, Y); }
+    const s = Math.min((tgt.x1 - tgt.x0) / (mxX - mnX), (tgt.y1 - tgt.y0) / (mxY - mnY));
+    const ox = (tgt.x0 + tgt.x1) / 2 - s * (mnX + mxX) / 2, oy = (tgt.y0 + tgt.y1) / 2 - s * (mnY + mxY) / 2;
+    return { s, PR: q => [ox + s * dot(q, cam.r), oy - s * dot(q, cam.u)] };
+  }
+  function render(ctx, F, cam, PR, lwk, alpha) {
+    const path = pts => { ctx.beginPath(); pts.forEach((q, i) => { const [X, Y] = PR(q); i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }); ctx.closePath(); };
+    const strokeLines = (lines, color, lw, a) => { if (!lines.length) return; ctx.globalAlpha = a; ctx.strokeStyle = color; ctx.lineWidth = lw * lwk; ctx.beginPath(); for (const [p, q] of lines) { const A = PR(p), B = PR(q); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); } ctx.stroke(); };
+    const vis = F.filter(f => dot(f.n, cam.v) > 1e-6).map(f => { let d = 0; for (const q of f.pts) d += dot(q, cam.f); return [f, d / f.pts.length]; });
+    vis.sort((a, b) => (a[0].layer - b[0].layer) || (b[1] - a[1]));
+    for (const [f] of vis) {
+      const A = alpha * f.alpha;
+      path(f.pts); ctx.globalAlpha = A; ctx.fillStyle = f.fill; ctx.fill();
+      for (const h of f.hatch) { ctx.save(); path(f.pts); ctx.clip(); strokeLines(hatchLines(f.pts, h), h.color, h.lw, A); ctx.restore(); }
+      if (f.stroke) { path(f.pts); ctx.globalAlpha = A; ctx.strokeStyle = f.stroke; ctx.lineWidth = f.lw * lwk; ctx.setLineDash(f.dash || []); ctx.stroke(); ctx.setLineDash([]); }
+      const y0 = f.pts[0][1];
+      for (const d of f.dec) {
+        const da = A * d.alpha; if (da <= 0) continue;
+        if (d.line) { strokeLines([[[d.line[0][0], y0 + d.line[0][1], d.line[0][2]], [d.line[1][0], y0 + d.line[1][1], d.line[1][2]]]], d.stroke, d.lw, da); continue; }
+        const pts = d.pts.map(q => [q[0], y0 + q[1], q[2]]);
+        if (d.fill) { path(pts); ctx.globalAlpha = da; ctx.fillStyle = d.fill; ctx.fill(); }
+        for (const h of d.hatch) { ctx.save(); path(pts); ctx.clip(); strokeLines(hatchLines(pts, h), h.color, h.lw, da); ctx.restore(); }
+        if (d.stroke) { path(pts); ctx.globalAlpha = da; ctx.strokeStyle = d.stroke; ctx.lineWidth = d.lw * lwk; ctx.stroke(); }
+      }
+    }
+    ctx.globalAlpha = 1;
+    return strokeLines;
+  }
+  return { LINE, LINE2, TONE, coursing, sideShade, scene, camera, fit, render, add, mul };
+})();
+
+/* the replacement drawing: demolished lots that were rebuilt, grouped by how much of their allowance the old building used.
+   Solid = the building torn down (median share of allowance in use); red outline = its replacement (median);
+   red bracket = middle half of replacements (25th to 75th percentile). From analysis_sample.csv, 17,911 rebuilt lots. */
+const REBUILT = [['Under 25%', .168, 1.05, .76, 1.356, 4225], ['25–50%', .36, 1.06, .853, 1.333, 6890], ['50–75%', .583, 1.02, .76, 1.328, 3784], ['75–100%', .84, 1.0, .85, 1.333, 1618]];
+function drawReplacement(cv, a, grow, la, B) {
+  const ctx = cv.getContext('2d'), W = cv.clientWidth, H = cv.clientHeight, dpr = dprOf();
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+  if (a <= 0) return '';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  const { TONE, coursing, sideShade, LINE } = AXO;
+  const accA = k => `rgba(176,18,27,${k})`;
+  const S = AXO.scene();
+  const HA = 50, LW = 16, D = 18, SP = 30, n = REBUILT.length;   // 100% of the allowance = 50 ft on a 16 x 18 ft lot
+  const X = i => i * SP;
+  REBUILT.forEach(([lab, before, after, p25, p75], i) => {
+    const x0 = X(i), x1 = x0 + LW, hb = before * HA;
+    // the building torn down
+    const ob = S.box(x0, 0, 0, x1, D, hb, TONE.house, { lw: .9, frontHatch: coursing, sideHatch: sideShade });
+    const nf = Math.max(1, Math.round(hb / 9)), fh = hb / nf;
+    for (let k = 0; k < nf; k++) for (const cx of [x0 + 4.4, x0 + 11.6]) S.windowOn(ob.fr, cx, k * fh + (fh - WIN.h - .8) / 2 + .3, 1);
+    S.rect(ob.fr, x0, hb - Math.min(.8, hb * .08), x1, hb, { fill: TONE.trim.f, lw: .5 });
+    // its replacement, rising out of it: red fill above the old roof, red outline for the whole volume
+    const ha = hb + (after * HA - hb) * grow;
+    if (ha > hb + .05) {
+      const grid = { type: 'grid', sp: 3, color: accA(.38), lw: .45 };
+      S.box(x0, 0, hb + .05, x1, D, ha, { f: accA(.07), s: accA(.07), t: accA(.07) }, { layer: 3, stroke: null, frontHatch: grid, sideHatch: grid, topHatch: grid });
+      S.box(x0, 0, 0, x1, D, ha, { f: 'rgba(0,0,0,0)', s: 'rgba(0,0,0,0)', t: 'rgba(0,0,0,0)' }, { layer: 3, stroke: accA(.95), lw: 1.2 });
+    }
+  });
+  const cam = AXO.camera(-16, 14);
+  const last = X(n - 1) + LW;
+  const tgt = B.wide ? { x0: B.x0 + 30, x1: B.x1 - 10, y0: B.y0 + 54, y1: B.y1 - 70 } : { x0: B.x0 - 6, x1: B.x1 - 4, y0: B.y0 + 62, y1: B.y1 - 46 };
+  const { s, PR } = AXO.fit(cam, [[-9, -8, 0], [last + 6, -8, 0], [-9, 0, 1.45 * HA], [last + 6, D, 1.4 * HA], [last, D, 0]], tgt);
+  const lwk = clamp(s / 9, .75, 1.35);
+  const G = (p, q, c, w, al = a) => { const A = PR(p), Bq = PR(q); ctx.globalAlpha = al; ctx.strokeStyle = c; ctx.lineWidth = w * lwk; ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(Bq[0], Bq[1]); ctx.stroke(); };
+  G([-9, -8.6, 0], [last + 6, -8.6, 0], LINE, .7); G([-9, -8, 0], [last + 6, -8, 0], LINE, .7); G([-9, 0, 0], [last + 6, 0, 0], '#8c8c8c', .5);
+  for (let x = -5; x <= last + 6; x += 5) G([x, -8, 0], [x, 0, 0], 'rgba(20,20,20,.18)', .45);
+  // scale: share of the allowance, on the front plane
+  G([-6, 0, 0], [-6, 0, 1.4 * HA], LINE, .7);
+  for (const v of [0, .5, 1, 1.25]) G([-6.9, 0, v * HA], [-6, 0, v * HA], LINE, .7);
+  G([-6, 0, .5 * HA], [last + 6, 0, .5 * HA], 'rgba(20,20,20,.14)', .5);
+  const line = AXO.render(ctx, S.F, cam, PR, lwk, a);
+  ctx.setLineDash([6, 4]); line([[[-6, 0, HA], [last + 6, 0, HA]]], LINE, 1, a); ctx.setLineDash([]);
+  // brackets: middle half of replacements
+  if (la > 0) REBUILT.forEach(([, , after, p25, p75], i) => {
+    const xb = X(i) + LW + 3.2;
+    line([[[xb, 0, p25 * HA], [xb, 0, p75 * HA]], [[xb - .9, 0, p25 * HA], [xb + .9, 0, p25 * HA]], [[xb - .9, 0, p75 * HA], [xb + .9, 0, p75 * HA]]], RED, 1, la * a);
+    line([[[xb - 1.4, 0, after * HA], [xb + 1.4, 0, after * HA]]], RED, 1.8, la * a);
+  });
+  // text
+  const T = (q, dx, dy, txt, o = '') => { const [x, y] = PR(q); return `<text x="${x + dx}" y="${y + dy}" ${o}>${txt}</text>`; };
+  let svg = `<g opacity="${a}" font-size="11" fill="${MUTE}">` + T([-6, 0, 0], -9, 4, '0%', 'text-anchor="end"') + T([-6, 0, .5 * HA], -9, 4, '50%', 'text-anchor="end"') + T([-6, 0, 1.25 * HA], -9, 4, '125%', 'text-anchor="end"') + '</g>';
+  svg += `<g opacity="${a}" font-size="11" font-weight="700" fill="${INK}">` + T([-6, 0, HA], -9, 4, '100%', 'text-anchor="end"') + '</g>' + `<g opacity="${a}" font-size="10" fill="${MUTE}">` + T([-6, 0, HA], -9, 16, 'allowed', 'text-anchor="end"') + '</g>';
+  const yRow = Math.max(...REBUILT.map((_, i) => PR([X(i) + LW / 2, -8.6, 0])[1])) + 22;
+  REBUILT.forEach(([lab, before, after, , , nn], i) => {
+    const cx = PR([X(i) + LW / 2, -8.6, 0])[0];
+    svg += `<g text-anchor="middle" font-size="${B.wide ? 12 : 10.5}"><text x="${cx}" y="${yRow}" font-weight="700" fill="${INK}" opacity="${a}">${esc(lab)}</text>` +
+      `<text x="${cx}" y="${yRow + 16}" fill="${INK}" opacity="${a}" class="num">${Math.round(before * 100)}% → <tspan fill="${RED}" font-weight="700" opacity="${la > 0 ? 1 : 0}">${Math.round(after * 100)}%</tspan></text>` +
+      `<text x="${cx}" y="${yRow + 31}" fill="${MUTE}" opacity="${a}" class="num">${fmt(nn)} lots</text></g>`;
+  });
+  // key
+  const kx = B.wide ? B.x0 - 40 : B.x0 - 40, ky = B.wide ? B.y0 + 22 : B.y0 + 30;
+  svg += `<g opacity="${a}" font-size="11" fill="${INK}"><rect x="${kx}" y="${ky - 9}" width="10" height="10" fill="${TONE.house.f}" stroke="${LINE}"/><text x="${kx + 15}" y="${ky}">Torn down</text>` +
+    `<rect x="${kx + 88}" y="${ky - 9}" width="10" height="10" fill="${accA(.08)}" stroke="${RED}"/><text x="${kx + 103}" y="${ky}">Replacement</text>` +
+    `<g opacity="${la}"><line x1="${kx + 196}" x2="${kx + 196}" y1="${ky - 10}" y2="${ky + 1}" stroke="${RED}"/><line x1="${kx + 192}" x2="${kx + 200}" y1="${ky - 4}" y2="${ky - 4}" stroke="${RED}" stroke-width="2"/><text x="${kx + 206}" y="${ky}">${B.wide ? 'Median and middle half of replacements' : 'Middle half'}</text></g></g>`;
+  return svg;
+}
+
+/* ======================================================================= 4. EVIDENCE */
+(() => {
+  const svg = $('#svg-ev');
+  function draw(t) {
+    const B = chartBox(svg);
+    const resc = ease(seg(t, 1.05, 1.7));
+    const ymax = lerp(7, 45, resc);
+    const farIn = ease(seg(t, 1.35, 1.95));
+    const hi = seg(t, 2.05, 2.5);
+    const chartA = seg(t, 0, .35) * (1 - seg(t, 2.95, 3.25));
+    let s = '';
+    if (chartA > 0) {
+      const ageBars = AGE.map(([l, v]) => ({ label: l, v, fill: '#9d9792', op: 1, val: v.toFixed(1), vo: 1 - resc }));
+      const farBars = FARB.map(([l, v], i) => ({ label: l, v: v * farIn, fill: i === 0 || i === 4 ? mix(INK, RED, hi) : INK, op: farIn * (hi > 0 && i > 0 && i < 4 ? 1 - .6 * hi : 1), val: v.toFixed(1), vo: seg(t, 1.8, 2.0) }));
+      const groups = [{ title: 'By year built', op: 1, bars: ageBars }];
+      if (farIn > 0) groups.push({ title: 'By share of allowed floor area in use', op: farIn, bars: farBars });
+      else groups.push({ title: '', op: 0, bars: FARB.map(([l]) => ({ label: l, v: 0, op: 0 })) });
+      s += `<g opacity="${chartA}">` + barsSVG(B, groups, ymax, { title: 'Demolitions per 1,000 lots', sub: 'in a three-year period, 2002–2026' });
+      if (hi > 0) {
+        const nb = 10, gap = 1.4, slot = (B.x1 - B.x0) / (nb + gap);
+        const x = B.x0 + slot * (5 + gap) + slot * .64 + 10; const y = B.y1 - (B.y1 - B.y0) * 42.52 / ymax;
+        s += `<text x="${x}" y="${y + 18}" font-size="14" font-weight="700" fill="${RED}" opacity="${hi}">41 times the rate</text><text x="${x}" y="${y + 36}" font-size="12" fill="${INK}" opacity="${hi}">of lots at their limit</text>`;
+      }
+      s += '</g>';
+    }
+    const rA = seg(t, 3.1, 3.45);
+    s += drawReplacement($('#c-ev'), rA, ease(seg(t, 3.25, 3.8)), seg(t, 3.6, 3.85), B);
+    if (rA > 0) s += `<g opacity="${rA}"><text x="${B.x0 - 40}" y="${B.y0 - 34}" font-size="13" font-weight="700" fill="${INK}">Share of the allowance in use, before and after demolition</text>` + wrapText('Demolished lots rebuilt within a few years, 2002–2026, grouped by how much of their allowance the old building used. Heights are medians.', B.x0 - 40, B.y0 - 16, B.wide ? 120 : 52, 12, MUTE) + '</g>';
+    svg.innerHTML = s;
+  }
+  addScene('evidence', draw);
+})();
+
+/* ======================================================================= 5. POLICY */
+(() => {
+  const svg = $('#svg-pol');
+  const UP = [['2006–09', 1.69, 1.28, 2.22], ['2009–12', 2.25, 1.66, 3.06], ['2012–15', 2.08, 1.38, 3.13], ['2015–18', 3.04, 1.72, 5.34], ['2018–21', 2.26, 1.45, 3.53], ['2021–24', 3.96, 2.13, 7.37]];
+  const DOWN = [['2006–09', .75, .55, 1.01], ['2009–12', .8, .59, 1.09], ['2012–15', .92, .54, 1.57], ['2018–21', .29, .14, .63], ['2021–24', .12, .03, .48]];
+  function draw(t) {
+    const B = chartBox(svg); const { x0, x1, y0, y1 } = B;
+    const lx = v => x0 + (x1 - x0) * (Math.log(clamp(v, .1, 8)) - Math.log(.1)) / (Math.log(8) - Math.log(.1));
+    const out = 1 - seg(t, 3.02, 3.3);
+    const axA = seg(t, 1.0, 1.35) * out, upA = seg(t, 1.05, 1.5) * out, dnA = seg(t, 2.05, 2.5) * out, rnd = seg(t, 1.3, 1.8);
+    let s = '';
+    const introA = seg(t, .15, .5) * (1 - seg(t, 1.02, 1.3));
+    if (introA > 0) s += bigNumber(B, '188,000', 'lots covered by rezonings the city adopted from 2003 to 2007', introA);
+    const cA = seg(t, 3.05, 3.4), cg = ease(seg(t, 3.15, 3.75));
+    if (cA > 0) {
+      const bars = [{ label: 'Old limits', v: 2547, fill: INK, op: 1, val: '2,547', vo: 1 }, { label: 'City of Yes limits', v: 4297 * cg, fill: RED, op: 1, fo: .35, dash: true, val: '4,297 (untested)', vo: seg(t, 3.6, 3.85) }];
+      const B2 = Object.assign({}, B, B.wide ? { x0: B.x0 + (B.x1 - B.x0) * .18, x1: B.x1 - (B.x1 - B.x0) * .18 } : {});
+      s += `<g opacity="${cA}">` + barsSVG(B2, [{ title: '', op: 1, bars }], 5000, { title: 'Demolitions the model expects over three years', sub: 'same model, old and new zoning limits; the new version is untested' }) + '</g>';
+    }
+    s += `<g opacity="${axA}">`;
+    s += `<text x="${x0}" y="${y0 - 34}" font-size="13" font-weight="700" fill="${INK}">Change in demolition rate after a rezoning</text>`;
+    s += `<text x="${x0}" y="${y0 - 16}" font-size="12" fill="${MUTE}">relative to similar lots the city left alone (log scale)</text>`;
+    for (const v of [.125, .25, .5, 1, 2, 4]) { const x = lx(v); s += `<line x1="${x}" x2="${x}" y1="${y0}" y2="${y1}" stroke="${v === 1 ? INK : RULE}" stroke-width="${v === 1 ? 1.2 : 1}"/><text x="${x}" y="${y1 + 18}" text-anchor="middle" font-size="11" fill="${MUTE}">${v}×</text>`; }
+    s += `<text x="${lx(1) + 6}" y="${y1 - 6}" font-size="11" fill="${INK}">no change</text></g>`;
+    const row = (yy, data, pooled, lab, a, col) => {
+      let r = `<g opacity="${a}"><text x="${x0}" y="${yy - 38}" font-size="13" font-weight="600" fill="${INK}">${lab}</text>`;
+      data.forEach(([n, v, lo, hi], i) => { const y = yy + (i - (data.length - 1) / 2) * 7; r += `<line x1="${lx(lo)}" x2="${lx(hi)}" y1="${y}" y2="${y}" stroke="${col}" stroke-opacity="${.25 * rnd}"/><circle cx="${lx(v)}" cy="${y}" r="2.6" fill="${col}" fill-opacity="${.45 * rnd}"/>`; });
+      const [v, lo, hi] = pooled;
+      r += `<line x1="${lx(lo)}" x2="${lx(hi)}" y1="${yy}" y2="${yy}" stroke="${col}" stroke-width="3"/><circle cx="${lx(v)}" cy="${yy}" r="7" fill="${col}" stroke="#fff" stroke-width="2"/>`;
+      r += `<text x="${lx(v)}" y="${yy - 14}" text-anchor="middle" font-size="15" font-weight="700" fill="${col}" class="num">${v.toFixed(2)}×</text></g>`;
+      return r;
+    };
+    const ya = y0 + (y1 - y0) * .3, yb = y0 + (y1 - y0) * .72;
+    s += row(ya, UP, [2.16, 1.85, 2.53], 'Limit raised', upA, RED);
+    s += row(yb, DOWN, [.68, .57, .82], 'Limit lowered', dnA, INK);
+    s += `<g opacity="${rnd * upA}">` + wrapText('Small dots: each round of rezoning. Large dots: all rounds pooled, with 95% intervals.', x0, y1 + 42, B.wide ? 120 : 52, 11, MUTE) + '</g>';
+    svg.innerHTML = s;
+  }
+  addScene('policy', draw);
+})();
+
+/* ======================================================================= 6. MAP + LOOKUP */
+const MAP = (() => {
+  const box = $('#mapbox'), cv = $('#c-map'), ctx = cv.getContext('2d'), tip = $('#maptip');
+  const BORO = ['', 'Manhattan', 'Bronx', 'Brooklyn', 'Queens', 'Staten Island'];
+  const LU = ['', 'One- and two-family', 'Multi-family walk-up', 'Multi-family elevator', 'Mixed residential and commercial', 'Commercial and office', 'Industrial and manufacturing', 'Transportation and utility', 'Public facilities and institutions', 'Open space', 'Parking', 'Vacant land'];
+  const UBAND = ['under 25%', '25–50%', '50–75%', '75–100%', '100% or more'];
+  let EXT = [0, 0, 47500, 46800];
+  let L = null, outlines = null, chunks = null, W = 0, H = 0, dpr = 1, view = null, hexCache = null, sel = -1, selXY = null, loading = false;
+  const chunkCache = new Map();
+  async function load() {
+    if (loading) return; loading = true;
+    const [lj, bj] = await Promise.all([fetch('data/lots.json').then(r => r.json()), fetch('data/boroughs.json').then(r => r.json())]);
+    const n = lj.n, buf = await gunzipB64(lj.gz);
+    const u16 = off => new Uint16Array(buf.buffer.slice(buf.byteOffset + off, buf.byteOffset + off + 2 * n));
+    const dx = u16(0), y = u16(2 * n), x = new Uint16Array(n); let acc = 0; for (let i = 0; i < n; i++) { acc += dx[i]; x[i] = acc; }
+    L = { n, x, y, pct: buf.slice(4 * n, 5 * n), flags: buf.slice(5 * n, 6 * n), chunk: buf.slice(6 * n, 7 * n), row: u16(7 * n), has: buf.slice(9 * n, 10 * n) };
+    chunks = lj.chunks; outlines = bj;
+    let a = 1e9, b = -1e9, c = 1e9, d = -1e9; for (const k in bj) for (const r of bj[k]) for (let i = 0; i < r.length; i += 2) { a = Math.min(a, r[i]); b = Math.max(b, r[i]); c = Math.min(c, r[i + 1]); d = Math.max(d, r[i + 1]); } EXT = [a, c, b, d];
+    $('#mapload').remove();
+    resize(); fitAll(); render();
+  }
+  function resize() { W = box.clientWidth; H = box.clientHeight; dpr = dprOf(); cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); hexCache = null; if (L) render(); }
+  function fitAll() { const pad = 16; const ex = EXT; const s = Math.min((W - 2 * pad) / (ex[2] - ex[0]), (H - 2 * pad) / (ex[3] - ex[1])); view = { cx: (ex[0] + ex[2]) / 2, cy: (ex[1] + ex[3]) / 2, s }; hexCache = null; }
+  const SX = x => (x - view.cx) * view.s + W / 2, SY = y => H / 2 - (y - view.cy) * view.s;
+  const WX = X => (X - W / 2) / view.s + view.cx, WY = Y => view.cy - (Y - H / 2) / view.s;
+  const DOTS = () => view.s >= .085;
+  function lowerBound(v) { let lo = 0, hi = L.n; while (lo < hi) { const m = (lo + hi) >> 1; if (L.x[m] < v) lo = m + 1; else hi = m; } return lo; }
+  const SQ3 = Math.sqrt(3);
+  function hexKey(wx, wy, R) {
+    const q = (SQ3 / 3 * wx - wy / 3) / R, r = (2 / 3 * wy) / R, y = -q - r;
+    let rx = Math.round(q), ry = Math.round(y), rz = Math.round(r);
+    const dx = Math.abs(rx - q), dy = Math.abs(ry - y), dz = Math.abs(rz - r);
+    if (dx > dy && dx > dz) rx = -ry - rz; else if (dy > dz) ry = -rx - rz; else rz = -rx - ry;
+    return [rx, rz];
+  }
+  const hexStore = new Map();
+  function hexes() {
+    // pointy-top hexes; radius quantised so small zoom changes reuse the same grid
+    const R = Math.pow(2, Math.round(Math.log2(7.5 / view.s) * 3) / 3);
+    if (hexCache && hexCache.R === R) return hexCache;
+    if (hexStore.has(R)) return (hexCache = hexStore.get(R));
+    const m = new Map();
+    for (let i = 0; i < L.n; i++) {
+      const [rx, rz] = hexKey(L.x[i], L.y[i], R);
+      const k = rx * 100000 + rz; let e = m.get(k); if (!e) { e = [rx, rz, 0, 0]; m.set(k, e); }
+      e[2]++; if (L.pct[i] >= 90) e[3]++;
+    }
+    hexCache = { R, map: m, list: [...m.values()] }; hexStore.set(R, hexCache); return hexCache;
+  }
+  const hexColor = sh => sh < .05 ? HEXR[0] : sh < .1 ? HEXR[1] : sh < .2 ? HEXR[2] : sh < .3 ? HEXR[3] : sh < .45 ? HEXR[4] : HEXR[5];
+  function drawOutlines(fill) {
+    ctx.beginPath();
+    for (const b in outlines) for (const r of outlines[b]) { for (let i = 0; i < r.length; i += 2) { const X = SX(r[i]), Y = SY(r[i + 1]); i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.closePath(); }
+    if (fill) { ctx.fillStyle = '#f1efec'; ctx.fill('evenodd'); } else { ctx.strokeStyle = '#b9b3ad'; ctx.lineWidth = .8; ctx.stroke(); }
+  }
+  function render() {
+    if (!L || !view) return;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawOutlines(true);
+    if (!DOTS()) {
+      const { R, list } = hexes();
+      for (const [q, r, n, top] of list) {
+        if (n < 15) continue;
+        const cx = R * SQ3 * (q + r / 2), cy = R * 1.5 * r; const X = SX(cx), Y = SY(cy); const rr = R * view.s * .96;
+        if (X < -rr || X > W + rr || Y < -rr || Y > H + rr) continue;
+        ctx.beginPath(); for (let k = 0; k < 6; k++) { const a = Math.PI / 180 * (60 * k - 30); const px = X + rr * Math.cos(a), py = Y + rr * Math.sin(a); k ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.closePath();
+        ctx.fillStyle = hexColor(top / n); ctx.fill();
+      }
+    } else {
+      const x0 = WX(-10), x1 = WX(W + 10), y0 = WY(H + 10), y1 = WY(-10);
+      const a = lowerBound(Math.max(0, x0)), b = lowerBound(Math.min(65535, x1 + 1));
+      const d = Math.max(1.6, Math.min(7, 14 * view.s));
+      for (let band = 0; band < 5; band++) {
+        ctx.fillStyle = RAMP[band];
+        for (let i = a; i < b; i++) { const py = L.y[i]; if (py < y0 || py > y1) continue; if (pctBand(L.pct[i]) !== band) continue; ctx.fillRect(SX(L.x[i]) - d / 2, SY(py) - d / 2, d, d); }
+      }
+    }
+    drawOutlines(false);
+    if (selXY) { const X = SX(selXY[0]), Y = SY(selXY[1]); ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(X, Y, 9, 0, 7); ctx.stroke(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(X, Y, 11, 0, 7); ctx.stroke(); }
+    legend();
+  }
+  function legend() {
+    const el = $('#legend');
+    if (DOTS()) el.innerHTML = `<span class="ttl">Each square is a lot, shaded by how its score ranks among all scored lots</span>` +
+      [['Below 75th percentile', 0], ['75th–90th', 1], ['90th–95th', 2], ['95th–99th', 3], ['Top 1%', 4]].map(([l, b]) => `<span class="k"><i style="background:${RAMP[b]}"></i>${l}</span>`).join('');
+    else el.innerHTML = `<span class="ttl">Share of lots in each hexagon that rank in the riskiest tenth citywide (hexagons with fewer than 15 lots left blank)</span>` +
+      [['Under 5%', 0], ['5–10%', 1], ['10–20%', 2], ['20–30%', 3], ['30–45%', 4], ['45% or more', 5]].map(([l, b]) => `<span class="k"><i style="background:${HEXR[b]}"></i>${l}</span>`).join('');
+  }
+  function zoomAt(f, X = W / 2, Y = H / 2) { const wx = WX(X), wy = WY(Y); view.s = clamp(view.s * f, .008, 2.5); view.cx = wx - (X - W / 2) / view.s; view.cy = wy + (Y - H / 2) / view.s; render(); }
+  $('#zin').onclick = () => zoomAt(2); $('#zout').onclick = () => zoomAt(.5); $('#zall').onclick = () => { fitAll(); render(); };
+  // pointer: drag to pan (mouse, pen, or two fingers on touch); ctrl/cmd + wheel zooms
+  const ptrs = new Map(); let drag = null, moved = false;
+  cv.addEventListener('pointerdown', e => {
+    if (!L) return; ptrs.set(e.pointerId, [e.offsetX, e.offsetY]); if (ptrs.size === 1) moved = false;
+    if (e.pointerType === 'mouse' || ptrs.size === 2) { drag = { cx: view.cx, cy: view.cy, s: view.s, p: midOf(), d: spread() }; moved = false; cv.setPointerCapture(e.pointerId); cv.classList.add('drag'); }
+  });
+  const midOf = () => { const v = [...ptrs.values()]; return [v.reduce((a, p) => a + p[0], 0) / v.length, v.reduce((a, p) => a + p[1], 0) / v.length]; };
+  const spread = () => { const v = [...ptrs.values()]; return v.length < 2 ? 0 : Math.hypot(v[0][0] - v[1][0], v[0][1] - v[1][1]); };
+  cv.addEventListener('pointermove', e => {
+    if (!L) return;
+    if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, [e.offsetX, e.offsetY]);
+    if (drag && (e.pointerType === 'mouse' ? e.buttons : ptrs.size === 2)) {
+      const m = midOf(); let s = drag.s; if (ptrs.size === 2 && drag.d > 0) s = clamp(drag.s * spread() / drag.d, .008, 2.5);
+      const wx = drag.cx + (drag.p[0] - W / 2) / drag.s, wy = drag.cy - (drag.p[1] - H / 2) / drag.s;
+      view.s = s; view.cx = wx - (m[0] - W / 2) / s; view.cy = wy + (m[1] - H / 2) / s;
+      if (Math.abs(m[0] - drag.p[0]) + Math.abs(m[1] - drag.p[1]) > 3) moved = true;
+      requestAnimationFrame(render); tip.style.display = 'none';
+    } else if (e.pointerType === 'mouse') hover(e.offsetX, e.offsetY);
+  });
+  const end = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2 && drag && e.pointerType !== 'mouse') drag = null; if (e.pointerType === 'mouse') { drag = null; cv.classList.remove('drag'); } };
+  cv.addEventListener('pointerup', e => { const wasDrag = moved; end(e); if (!wasDrag) clickAt(e.offsetX, e.offsetY); });
+  cv.addEventListener('pointercancel', end);
+  cv.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
+  cv.addEventListener('wheel', e => { if (!L || !(e.ctrlKey || e.metaKey)) return; e.preventDefault(); zoomAt(Math.exp(-e.deltaY * .0025), e.offsetX, e.offsetY); }, { passive: false });
+  function nearest(X, Y, rpx) {
+    const wx = WX(X), wy = WY(Y), r = rpx / view.s; const a = lowerBound(Math.max(0, wx - r)), b = lowerBound(wx + r + 1); let best = -1, bd = r * r;
+    for (let i = a; i < b; i++) { const dx = L.x[i] - wx, dy = L.y[i] - wy, d = dx * dx + dy * dy; if (d <= bd) { bd = d; best = i; } }
+    return best;
+  }
+  function hover(X, Y) {
+    if (DOTS()) { const i = nearest(X, Y, 6); if (i < 0) { tip.style.display = 'none'; return; } tip.innerHTML = `Ranks above <b>${L.pct[i]}%</b> of lots<br><span style="color:${MUTE}">Click for details</span>`; }
+    else {
+      const { R, map } = hexes(); const [rx, rz] = hexKey(WX(X), WY(Y), R);
+      const e = map.get(rx * 100000 + rz); if (!e || e[2] < 15) { tip.style.display = 'none'; return; }
+      tip.innerHTML = `<b>${fmt(e[2])}</b> lots<br><b>${Math.round(100 * e[3] / e[2])}%</b> in the riskiest tenth<br><span style="color:${MUTE}">Zoom in to see single lots</span>`;
+    }
+    tip.style.display = 'block'; tip.style.left = Math.min(W - 180, X + 14) + 'px'; tip.style.top = Math.min(H - 70, Y + 14) + 'px';
+  }
+  function clickAt(X, Y) {
+    if (!DOTS()) { zoomAt(view.s < .03 ? 4 : 2.2, X, Y); return; }
+    const i = nearest(X, Y, 8); if (i < 0) return; showLot(i);
+  }
+  async function getChunk(key) {
+    if (chunkCache.has(key)) return chunkCache.get(key);
+    const p = fetch(`data/a/${key}.json`).then(r => r.json()).then(async j => JSON.parse(new TextDecoder().decode(await gunzipB64(j.gz))));
+    chunkCache.set(key, p); return p;
+  }
+  async function showLot(i) {
+    sel = i; selXY = [L.x[i], L.y[i]]; render();
+    if (!L.has[i]) { renderDetail(null, i); return; }
+    const ch = await getChunk(chunks[L.chunk[i]]); const r = ch.r[L.row[i]]; renderDetail({ street: ch.s[r[1]], row: r }, i);
+  }
+  function title(s) { return s.toLowerCase().replace(/\b([a-z])/g, m => m.toUpperCase()).replace(/\b(\d+)(?= (Street|Avenue|Road|Place|Drive|Lane|Court|Terrace))/g, n => n + ordSuf(+n)); }
+  function ordSuf(n) { const v = n % 100; if (v >= 11 && v <= 13) return 'th'; return ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; }
+  function renderDetail(rec, i) {
+    const el = $('#detail'); el.style.display = 'block';
+    const flags = i >= 0 ? L.flags[i] : 0; const pct = i >= 0 ? L.pct[i] : null;
+    let head = 'Lot with no address on record', where = '', bbl = '';
+    if (rec) { const r = rec.row; head = title(`${r[0]} ${rec.street}`.trim()); bbl = String(r[r.length - 1]); where = `${BORO[+bbl[0]]}${r[2] ? ' ' + r[2] : ''} · tax lot ${bbl[0]}-${bbl.slice(1, 6)}-${bbl.slice(6)}`; }
+    if (rec && rec.row[3] === -1) {
+      const r = rec.row; const why = ['', 'The model leaves out condominiums, which are rarely torn down.', 'The city\'s lot records show no building here.', 'The lot has no recorded area.', 'The zoning on record sets no residential or commercial limit.', 'This lot could not be scored.'][r[4]];
+      el.innerHTML = `<h3>${esc(head)}</h3><div class="where">${esc(where)}</div><p>Not scored. ${why}</p>${r[7] ? '<p>In a historic district or a designated landmark.</p>' : ''}`;
+      if (r[5] > 0 && r[6] > 0) { selXY = [r[5], r[6]]; centerOn(r[5], r[6]); }
+      return;
+    }
+    let bf = null, mf = null, mfc = null, yb = 0, nf = 0, lu = 0;
+    if (rec) { const r = rec.row; bf = r[6] / 100; mf = r[7] / 100; mfc = r[8] / 100; yb = r[9]; nf = r[10]; lu = r[11]; }
+    const prot = flags & 1, filed = flags & 2, ub = (flags >> 2) & 7;
+    const use = mf > 0 && bf >= 0 ? bf / mf : null;
+    const band = pctBand(pct); const bandTxt = ['below the riskiest quarter', 'in the riskiest quarter', 'in the riskiest tenth', 'in the riskiest 5 percent', 'in the riskiest 1 percent'][band];
+    el.innerHTML = `<h3>${esc(head)}</h3><div class="where">${esc(where)}</div>` +
+      (filed ? `<span class="flag">Demolition filed since Jan. 2024</span>` : '') +
+      `<div class="pctline"><span class="big num">${pct}</span><span>Ranks above ${pct} percent of the city's scored lots, ${bandTxt}.</span></div>` +
+      `<div class="pctbar" aria-hidden="true"><i style="left:calc(${pct}% - 1px)"></i></div>` +
+      (use !== null ? farBlock(bf, mf, mfc, use) : `<div>Floor area use: ${UBAND[ub]} of its allowance</div>`) +
+      `<dl class="facts" style="margin-top:.8rem">` +
+      (bf !== null ? `<dt>Built FAR</dt><dd class="num">${bf.toFixed(2)}</dd>` : '') +
+      (mf > 0 ? `<dt>Limit, 2024</dt><dd class="num">${mf.toFixed(2)}</dd>` : '') +
+      (mfc > 0 ? `<dt>Limit, 2026</dt><dd class="num">${mfc.toFixed(2)}${mfc > mf * 1.0001 ? ' <span style="color:var(--red)">raised</span>' : mfc < mf * .9999 ? ' lowered' : ''}</dd>` : '') +
+      `<dt>Landmark or historic district</dt><dd>${prot ? 'Yes' : 'No'}</dd>` +
+      (yb ? `<dt>Year built on record</dt><dd class="num">${yb}</dd>` : '') + (nf ? `<dt>Floors</dt><dd class="num">${nf}</dd>` : '') + (lu ? `<dt>Use</dt><dd>${LU[lu] || ''}</dd>` : '') +
+      `</dl><p class="caveat">The score measures how much this lot resembles lots demolished in the past, mostly through unused floor area. It is not a forecast for this building. Data: PLUTO 26v3 and 24v1; DOB filings.</p>`;
+  }
+  function farBlock(bf, mf, mfc, use) {
+    const top = Math.max(bf, mf, mfc || 0) * 1.04; const P = v => (100 * v / top).toFixed(1) + '%';
+    return `<div><b>Uses ${Math.round(100 * use)}%</b> of the floor area its zoning allowed before City of Yes</div>` +
+      `<div class="farbar" aria-hidden="true"><span class="used" style="width:${P(bf)}"></span><span class="coy" style="left:${P(mf)};background:var(--ink)"></span>${mfc > 0 && Math.abs(mfc - mf) > .005 ? `<span class="coy" style="left:${P(mfc)}"></span>` : ''}</div>` +
+      `<div style="font-size:.72rem;color:var(--mute)">Bar: built floor area. Black tick: 2024 limit${mfc > 0 && Math.abs(mfc - mf) > .005 ? '. Red tick: 2026 limit' : ''}.</div>`;
+  }
+  function centerOn(x, y) { view.cx = x; view.cy = y; view.s = Math.max(view.s, .5); hexCache = null; render(); }
+  // ------------------------------------------------ address search
+  const SUF = { ST: 'STREET', STR: 'STREET', AVE: 'AVENUE', AV: 'AVENUE', BLVD: 'BOULEVARD', PL: 'PLACE', RD: 'ROAD', DR: 'DRIVE', CT: 'COURT', LN: 'LANE', PKWY: 'PARKWAY', PKY: 'PARKWAY', TER: 'TERRACE', TERR: 'TERRACE', HWY: 'HIGHWAY', SQ: 'SQUARE', EXPY: 'EXPRESSWAY', TPKE: 'TURNPIKE', CIR: 'CIRCLE', BCH: 'BEACH' };
+  const DIR = { E: 'EAST', W: 'WEST', N: 'NORTH', S: 'SOUTH' };
+  const ORD = { FIRST: '1', SECOND: '2', THIRD: '3', FOURTH: '4', FIFTH: '5', SIXTH: '6', SEVENTH: '7', EIGHTH: '8', NINTH: '9', TENTH: '10', ELEVENTH: '11', TWELFTH: '12' };
+  function normStreet(s) {
+    const t = s.toUpperCase().replace(/[^A-Z0-9\- ]/g, ' ').split(/\s+/).filter(Boolean);
+    return t.map((w0, i) => { let w = w0; const m = w.match(/^(\d+)(ST|ND|RD|TH)$/); if (m) w = m[1]; w = ORD[w] || w; if (w === 'SAINT') w = 'ST'; if (w === 'FORT') w = 'FT';
+      if (i === t.length - 1 && t.length > 1 && SUF[w]) w = SUF[w]; else if (i < t.length - 1 && SUF[w] && w !== 'ST') w = SUF[w];
+      if (i === 0 && t.length > 1 && DIR[w]) w = DIR[w]; return w; }).join(' ');
+  }
+  function splitAddr(a) { const m = a.trim().match(/^(\d[\dA-Za-z\-\/]*)\s+(.*)$/); return m ? [m[1].toUpperCase(), m[2]] : ['', a.trim()]; }
+  function keyFor(b, sn) {
+    const ch = sn[0] || ''; const base = /\d/.test(ch) ? '0' : /[A-Z]/.test(ch) ? ch : '_'; const k1 = `${b}${base}`;
+    if (chunks.includes(k1)) return [k1];
+    const t = sn.split(' ');
+    if (base === '0') { const cands = chunks.filter(k => k.startsWith(`${b}0${ch}`)); const two = `${b}0${sn.slice(0, 2)}`; if (cands.includes(two)) return [two]; const one = `${b}0${ch}`; if (cands.includes(one)) return [one]; const u = `${b}0${ch}_`; return cands.includes(u) ? [u] : cands; }
+    if (['EAST', 'WEST', 'NORTH', 'SOUTH'].includes(t[0]) && t[1]) { const k = `${b}${base}${t[1][0]}`; if (chunks.includes(k)) return [k]; }
+    const k2 = `${b}${base}${sn[1] && /[A-Z0-9]/.test(sn[1]) ? sn[1] : '_'}`; if (chunks.includes(k2)) return [k2];
+    return chunks.filter(k => k.startsWith(k1));
+  }
+  let qTimer = 0, qSeq = 0;
+  const input = $('#addr'), boroSel = $('#boro'), list = $('#results'), status = $('#lk-status');
+  input.addEventListener('input', () => { clearTimeout(qTimer); qTimer = setTimeout(search, 180); });
+  boroSel.addEventListener('change', search);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const b = list.querySelector('button'); if (b) b.click(); } if (e.key === 'ArrowDown') { const b = list.querySelector('button'); if (b) { e.preventDefault(); b.focus(); } } });
+  list.addEventListener('keydown', e => { const items = [...list.querySelectorAll('button')]; const i = items.indexOf(document.activeElement); if (e.key === 'ArrowDown' && i < items.length - 1) { e.preventDefault(); items[i + 1].focus(); } if (e.key === 'ArrowUp') { e.preventDefault(); (i > 0 ? items[i - 1] : input).focus(); } });
+  async function search() {
+    const q = input.value.trim(); const b = +boroSel.value; const my = ++qSeq;
+    if (!chunks) { status.textContent = 'The lot data is still loading.'; return; }
+    if (q.length < 3) { list.style.display = 'none'; status.textContent = 'Type a house number and street, or click a lot on the map.'; return; }
+    const [h, st] = splitAddr(q); const sn = normStreet(st); if (!sn) return;
+    status.textContent = 'Searching…';
+    const keys = keyFor(b, sn).slice(0, 6); const res = [];
+    for (const k of keys) {
+      const ch = await getChunk(k); if (my !== qSeq) return;
+      const sNorm = ch.sn || (ch.sn = ch.s.map(normStreet));
+      const okStreets = new Set(); sNorm.forEach((s, i) => { if (s.startsWith(sn) || s === sn) okStreets.add(i); });
+      for (const r of ch.r) { if (!okStreets.has(r[1])) continue; if (h && !String(r[0]).startsWith(h)) continue; res.push([h && String(r[0]) === h ? 0 : 1, sNorm[r[1]] === sn ? 0 : 1, r, ch.s[r[1]]]); if (res.length > 4000) break; }
+    }
+    res.sort((a, b) => a[0] - b[0] || a[1] - b[1] || (parseInt(a[2][0]) || 0) - (parseInt(b[2][0]) || 0));
+    const top = res.slice(0, 12);
+    list.innerHTML = top.map((x, k) => { const r = x[2]; const scored = r[3] >= 0; return `<li><button type="button" data-k="${k}">${esc(title(`${r[0]} ${x[3]}`))}<br><span class="sub">${BORO[b]}${r[2] ? ' ' + r[2] : ''}${scored ? ` · ranks above ${r[4]}%` : ' · not scored'}</span></button></li>`; }).join('');
+    list.style.display = top.length ? 'block' : 'none';
+    status.textContent = top.length ? `${res.length > 12 ? 'Showing 12 of ' + fmt(res.length) : fmt(res.length)} match${res.length === 1 ? '' : 'es'}.` : 'No matching address in this borough. Try the street name alone, or check the borough.';
+    list.querySelectorAll('button').forEach(btn => btn.onclick = () => { const x = top[+btn.dataset.k]; pick(x[2], x[3]); });
+  }
+  function pick(r, street) {
+    list.style.display = 'none';
+    if (r[3] >= 0) { const i = r[3]; sel = i; selXY = [L.x[i], L.y[i]]; centerOn(L.x[i], L.y[i]); renderDetail({ street, row: r }, i); }
+    else renderDetail({ street, row: r }, -1);
+    $('#detail').scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' });
+  }
+  // load when the reader gets near
+  const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); load(); } }, { rootMargin: '1800px 0px' });
+  io.observe(box);
+  new ResizeObserver(() => { if (L) resize(); }).observe(box);
+  return {};
+})();
+
+// first paint
+for (const sc of scenes) sc.resize && sc.resize();
+request();
+</script>
+</body>
+</html>
